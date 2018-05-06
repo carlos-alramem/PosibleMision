@@ -5,13 +5,17 @@
  */
 package Controllers;
 
+import Entities.Alumno;
 import GUI.Controllers.MainController;
+import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 public class LiceoLatinoamericano extends Application {
     
@@ -28,6 +32,19 @@ public class LiceoLatinoamericano extends Application {
             primaryStage.setScene(sceneHome);
             primaryStage.initStyle(StageStyle.UNDECORATED);
             primaryStage.show();
+            
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+            
+            AlumnoJpaController alm = new AlumnoJpaController(emf);
+            
+            List<Alumno> al = alm.findAlumnoEntities();
+            
+            for (Alumno alumno : al) {
+                
+                System.out.println(alumno.getNombres());
+                
+            }
+            
         } 
         catch (Exception e) {
             
