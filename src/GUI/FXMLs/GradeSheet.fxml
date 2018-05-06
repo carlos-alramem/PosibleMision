@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="1313.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.141" fx:controller="GUI.Controllers.GradeSheetController">
+    <stylesheets>
+        <URL value="@/GUI/Styles/main.css" />
+    </stylesheets>
+   <children>
+      <BorderPane prefHeight="420.0" prefWidth="1313.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <right>
+            <FlowPane alignment="BOTTOM_CENTER" columnHalignment="CENTER" prefHeight="432.0" prefWidth="45.0" rowValignment="BOTTOM" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+               <children>
+                  <Button layoutX="10.0" layoutY="397.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Alumnos">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="397.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Profesores">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="241.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Grados">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="189.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Materias">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="344.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Actividades">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </FlowPane>
+         </right>
+         <center>
+            <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <BorderPane styleClass="main-content">
+                     <center>
+                        <TableView fx:id="mainTable" editable="true" prefHeight="432.0" prefWidth="822.0" styleClass="main-table" BorderPane.alignment="CENTER">
+                           <columns>
+                              <TableColumn editable="false" prefWidth="25.0" resizable="false">
+                                 <graphic>
+                                    <Label styleClass="table-view-column-header-label" text="Nº" textAlignment="CENTER" wrapText="true">
+                                       <font>
+                                          <Font name="Exo 2 Semi Bold" size="11.0" />
+                                       </font>
+                                    </Label>
+                                 </graphic>
+                              </TableColumn>
+                              <TableColumn editable="false" prefWidth="225.0" resizable="false">
+                                 <graphic>
+                                    <StackPane prefHeight="70.0" prefWidth="219.0">
+                                       <children>
+                                          <Label styleClass="table-view-column-header-label" text="ALUMNO/A" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </StackPane>
+                                 </graphic>
+                              </TableColumn>
+                              <TableColumn prefWidth="75.0" resizable="false" sortable="false">
+                                 <columns>
+                                    <TableColumn editable="false" prefWidth="60.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="PRIMER TRIMESTRE" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn minWidth="0.0" prefWidth="60.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="SEGUNDO TRIMESTRE" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn editable="false" prefWidth="60.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="TERCER TRIMESTRE" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn editable="false" prefWidth="60.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="PROMEDIO ANUAL" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn editable="false" prefWidth="72.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="NOTA GLOBAL MINED" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn editable="false" prefWidth="78.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="PERÍODO DE RECUPERACIÓN MINED" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn editable="false" prefWidth="90.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="PERÍODO EXTRAORDINARIO" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn editable="false" prefWidth="78.0" resizable="false">
+                                       <graphic>
+                                          <Label styleClass="table-view-column-header-label" text="PERÍODO DE RECUPERACIÓN LICEO" textAlignment="CENTER" wrapText="true">
+                                             <font>
+                                                <Font name="Exo 2 Semi Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                 </columns>
+                                 <graphic>
+                                    <Label text="LENGUAJE">
+                                       <styleClass>
+                                          <String fx:value="table-view-column-header-label" />
+                                          <String fx:value="table-view-column-header-label-tittle" />
+                                       </styleClass>
+                                    </Label>
+                                 </graphic>
+                              </TableColumn>
+                           </columns>
+                        </TableView>
+                     </center>
+                     <top>
+                        <BorderPane prefHeight="68.0" prefWidth="438.0" BorderPane.alignment="CENTER">
+                           <top>
+                              <Label styleClass="main-menu-label" text="Seleccione el grado que desea consultar:" BorderPane.alignment="TOP_LEFT">
+                                 <font>
+                                    <Font name="Exo 2 Semi Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                           </top>
+                           <center>
+                              <FlowPane prefHeight="68.0" prefWidth="1061.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <ComboBox layoutX="366.0" layoutY="10.0" prefHeight="33.0" prefWidth="71.0" promptText="2017" styleClass="main-content-combo-box">
+                                       <FlowPane.margin>
+                                          <Insets right="15.0" />
+                                       </FlowPane.margin>
+                                    </ComboBox>
+                                    <ComboBox prefHeight="33.0" prefWidth="158.0" promptText="Grado" styleClass="main-content-combo-box">
+                                       <FlowPane.margin>
+                                          <Insets right="15.0" />
+                                       </FlowPane.margin>
+                                    </ComboBox>
+                                    <ComboBox layoutX="106.0" layoutY="10.0" prefHeight="33.0" prefWidth="158.0" promptText="Lenguaje" styleClass="main-content-combo-box" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" />
+                                 </padding>
+                              </FlowPane>
+                           </center>
+                           <BorderPane.margin>
+                              <Insets left="10.0" right="10.0" top="10.0" />
+                           </BorderPane.margin>
+                           <bottom>
+                              <Label styleClass="main-content-label" text="Profesor:" BorderPane.alignment="TOP_LEFT">
+                                 <font>
+                                    <Font name="Exo 2 Medium" size="13.0" />
+                                 </font>
+                                 <BorderPane.margin>
+                                    <Insets top="5.0" />
+                                 </BorderPane.margin>
+                              </Label>
+                           </bottom>
+                           <right>
+                              <FlowPane alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="38.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Button disable="true" mnemonicParsing="false" prefHeight="33.0" prefWidth="18.0" text="">
+                                       <font>
+                                          <Font name="FontAwesome" size="16.0" />
+                                       </font>
+                                       <padding>
+                                          <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                       </padding>
+                                       <styleClass>
+                                          <String fx:value="main-menu-button" />
+                                          <String fx:value="main-menu-button-inner" />
+                                       </styleClass>
+                                       <tooltip>
+                                          <Tooltip text="Materia anterior" />
+                                       </tooltip>
+                                    </Button>
+                                    <Button disable="true" layoutX="192.0" layoutY="10.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="18.0" text="">
+                                       <font>
+                                          <Font name="FontAwesome" size="16.0" />
+                                       </font>
+                                       <padding>
+                                          <Insets bottom="1.0" left="3.0" right="1.0" top="1.0" />
+                                       </padding>
+                                       <styleClass>
+                                          <String fx:value="main-menu-button" />
+                                          <String fx:value="main-menu-button-inner" />
+                                       </styleClass>
+                                       <FlowPane.margin>
+                                          <Insets left="2.0" />
+                                       </FlowPane.margin>
+                                       <tooltip>
+                                          <Tooltip text="Materia siguiente" />
+                                       </tooltip>
+                                    </Button>
+                                 </children>
+                              </FlowPane>
+                           </right>
+                        </BorderPane>
+                     </top>
+                  </BorderPane>
+               </children>
+               <BorderPane.margin>
+                  <Insets right="10.0" />
+               </BorderPane.margin>
+            </HBox>
+         </center>
+      </BorderPane>
+   </children>
+   <padding>
+      <Insets bottom="10.0" right="10.0" top="10.0" />
+   </padding>
+</AnchorPane>

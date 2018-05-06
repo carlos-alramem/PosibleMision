@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="452.0" prefWidth="1313.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.Controllers.GradeMainController">
+   <children>
+      <BorderPane prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <BorderPane styleClass="main-content">
+                     <center>
+                        <TableView fx:id="mainTable" editable="true" prefHeight="432.0" prefWidth="1073.0" styleClass="main-table" BorderPane.alignment="CENTER">
+                           <columns>
+                              <TableColumn prefWidth="75.0" resizable="false" sortable="false">
+                                 <columns>
+                                    <TableColumn prefWidth="75.0" resizable="false" sortable="false">
+                                       <columns>
+                                          <TableColumn editable="false" prefWidth="25.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="Nº" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn editable="false" prefWidth="225.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="ALUMNO/A" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn minWidth="0.0" prefWidth="50.0">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="HOJA DE TAREAS" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn prefWidth="64.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="REVISIÓN LIBROS Y CUADERNOS" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn minWidth="0.0" prefWidth="82.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="TAREA DE INVESTIGACIÓN Y/O EXPOSICIÓN" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn minWidth="0.0" prefWidth="72.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="LABORATORIO ESCRITO" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn editable="false" prefWidth="56.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="PROMEDIO PURO" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn editable="false" prefWidth="56.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="PROMEDIO 70%" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn prefWidth="50.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="EXAMEN" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn editable="false" minWidth="4.0" prefWidth="56.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="PROMEDIO 30%" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn prefWidth="56.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="PROMEDIO FINAL" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                          <TableColumn editable="false" prefWidth="67.0" resizable="false">
+                                             <graphic>
+                                                <Label styleClass="table-view-column-header-label" text="CONVERSIÓN DE NOTA 28%" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </graphic>
+                                          </TableColumn>
+                                       </columns>
+                                       <graphic>
+                                          <Label text="FEBRERO 28%">
+                                             <styleClass>
+                                                <String fx:value="table-view-column-header-label" />
+                                                <String fx:value="table-view-column-header-label-tittle" />
+                                             </styleClass>
+                                          </Label>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn prefWidth="50.0" resizable="false">
+                                       <graphic>
+                                          <StackPane prefHeight="75.0" prefWidth="48.0">
+                                             <children>
+                                                <Label minWidth="60.0" rotate="-90.0" styleClass="table-view-column-header-label" text="LLEGADAS&#10;TARDE" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn minWidth="0.0" prefWidth="50.0" resizable="false">
+                                       <graphic>
+                                          <StackPane prefHeight="75.0">
+                                             <children>
+                                                <Label minWidth="60.0" rotate="-90.0" styleClass="table-view-column-header-label" text="AUSENCIAS" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn prefWidth="50.0" resizable="false">
+                                       <graphic>
+                                          <StackPane prefHeight="75.0" prefWidth="200.0">
+                                             <children>
+                                                <Label minWidth="60.0" rotate="-90.0" styleClass="table-view-column-header-label" text="ASISTENCIA" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                   <StackPane.margin>
+                                                      <Insets />
+                                                   </StackPane.margin>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                       </graphic>
+                                    </TableColumn>
+                                    <TableColumn prefWidth="50.0" resizable="false">
+                                       <graphic>
+                                          <StackPane prefHeight="75.0" prefWidth="200.0">
+                                             <children>
+                                                <Label minWidth="60.0" rotate="-90.0" styleClass="table-view-column-header-label" text="CONDUCTA" textAlignment="CENTER" wrapText="true">
+                                                   <font>
+                                                      <Font name="Exo 2 Semi Bold" size="11.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                       </graphic>
+                                    </TableColumn>
+                                 </columns>
+                                 <graphic>
+                                    <Label text="LENGUAJE">
+                                       <styleClass>
+                                          <String fx:value="table-view-column-header-label" />
+                                          <String fx:value="table-view-column-header-label-tittle" />
+                                       </styleClass>
+                                    </Label>
+                                 </graphic>
+                              </TableColumn>
+                           </columns>
+                        </TableView>
+                     </center>
+                     <top>
+                        <BorderPane prefHeight="68.0" prefWidth="969.0" BorderPane.alignment="CENTER">
+                           <bottom>
+                              <Label styleClass="main-content-label" text="Profesor:" BorderPane.alignment="TOP_LEFT">
+                                 <font>
+                                    <Font name="Exo 2 Medium" size="13.0" />
+                                 </font>
+                                 <BorderPane.margin>
+                                    <Insets top="5.0" />
+                                 </BorderPane.margin>
+                              </Label>
+                           </bottom>
+                           <top>
+                              <Label styleClass="main-menu-label" text="Seleccione el grado, materia y mes del que desea agregar notas:" BorderPane.alignment="TOP_LEFT">
+                                 <font>
+                                    <Font name="Exo 2 Semi Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                           </top>
+                           <center>
+                              <FlowPane prefHeight="68.0" prefWidth="1061.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <ComboBox prefHeight="33.0" prefWidth="158.0" promptText="Grado" styleClass="main-content-combo-box">
+                                       <FlowPane.margin>
+                                          <Insets right="15.0" />
+                                       </FlowPane.margin>
+                                    </ComboBox>
+                                    <ComboBox prefHeight="33.0" prefWidth="158.0" promptText="Materia" styleClass="main-content-combo-box">
+                                       <FlowPane.margin>
+                                          <Insets right="15.0" />
+                                       </FlowPane.margin>
+                                    </ComboBox>
+                                    <ComboBox prefHeight="33.0" prefWidth="158.0" promptText="Mes" styleClass="main-content-combo-box" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" />
+                                 </padding>
+                              </FlowPane>
+                           </center>
+                           <BorderPane.margin>
+                              <Insets left="10.0" right="10.0" top="10.0" />
+                           </BorderPane.margin>
+                        </BorderPane>
+                     </top>
+                  </BorderPane>
+               </children>
+               <BorderPane.margin>
+                  <Insets right="10.0" />
+               </BorderPane.margin>
+            </HBox>
+         </center>
+         <right>
+            <FlowPane alignment="BOTTOM_CENTER" columnHalignment="CENTER" prefHeight="432.0" prefWidth="45.0" rowValignment="BOTTOM" BorderPane.alignment="CENTER">
+               <children>
+                  <Button layoutX="10.0" layoutY="397.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Alumnos">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="397.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Profesores">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="241.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Grados">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="189.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Materias">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button layoutX="10.0" layoutY="344.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" styleClass="main-content-button" text="">
+                     <font>
+                        <Font name="FontAwesome" size="26.0" />
+                     </font>
+                     <tooltip>
+                        <Tooltip autoHide="true" opacity="0.75" text="Administrar Actividades">
+                           <font>
+                              <Font name="Exo 2 Semi Bold" size="12.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
+                     <FlowPane.margin>
+                        <Insets top="7.0" />
+                     </FlowPane.margin>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </FlowPane>
+         </right>
+      </BorderPane>
+   </children>
+   <padding>
+      <Insets bottom="10.0" right="10.0" top="10.0" />
+   </padding>
+</AnchorPane>
