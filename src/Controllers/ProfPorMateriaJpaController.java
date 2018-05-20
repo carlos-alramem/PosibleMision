@@ -14,7 +14,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import Entities.MatPorCurso;
 import Entities.ProfPorMateria;
-import Entities.ProfPorMateriaPK;
 import Entities.Profesor;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -22,7 +21,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class ProfPorMateriaJpaController implements Serializable {
 
@@ -36,37 +35,32 @@ public class ProfPorMateriaJpaController implements Serializable {
     }
 
     public void create(ProfPorMateria profPorMateria) throws PreexistingEntityException, Exception {
-        if (profPorMateria.getProfPorMateriaPK() == null) {
-            profPorMateria.setProfPorMateriaPK(new ProfPorMateriaPK());
-        }
-        profPorMateria.getProfPorMateriaPK().setCodMatPorCurso(profPorMateria.getMatPorCurso().getMatPorCursoPK().getCodigo());
-        profPorMateria.getProfPorMateriaPK().setDuiProfesor(profPorMateria.getProfesor().getDui());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            MatPorCurso matPorCurso = profPorMateria.getMatPorCurso();
-            if (matPorCurso != null) {
-                matPorCurso = em.getReference(matPorCurso.getClass(), matPorCurso.getMatPorCursoPK());
-                profPorMateria.setMatPorCurso(matPorCurso);
+            MatPorCurso codMatPorCurso = profPorMateria.getCodMatPorCurso();
+            if (codMatPorCurso != null) {
+                codMatPorCurso = em.getReference(codMatPorCurso.getClass(), codMatPorCurso.getCodigo());
+                profPorMateria.setCodMatPorCurso(codMatPorCurso);
             }
-            Profesor profesor = profPorMateria.getProfesor();
-            if (profesor != null) {
-                profesor = em.getReference(profesor.getClass(), profesor.getDui());
-                profPorMateria.setProfesor(profesor);
+            Profesor duiProfesor = profPorMateria.getDuiProfesor();
+            if (duiProfesor != null) {
+                duiProfesor = em.getReference(duiProfesor.getClass(), duiProfesor.getDui());
+                profPorMateria.setDuiProfesor(duiProfesor);
             }
             em.persist(profPorMateria);
-            if (matPorCurso != null) {
-                matPorCurso.getProfPorMateriaList().add(profPorMateria);
-                matPorCurso = em.merge(matPorCurso);
+            if (codMatPorCurso != null) {
+                codMatPorCurso.getProfPorMateriaList().add(profPorMateria);
+                codMatPorCurso = em.merge(codMatPorCurso);
             }
-            if (profesor != null) {
-                profesor.getProfPorMateriaList().add(profPorMateria);
-                profesor = em.merge(profesor);
+            if (duiProfesor != null) {
+                duiProfesor.getProfPorMateriaList().add(profPorMateria);
+                duiProfesor = em.merge(duiProfesor);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findProfPorMateria(profPorMateria.getProfPorMateriaPK()) != null) {
+            if (findProfPorMateria(profPorMateria.getCodigo()) != null) {
                 throw new PreexistingEntityException("ProfPorMateria " + profPorMateria + " already exists.", ex);
             }
             throw ex;
@@ -78,47 +72,45 @@ public class ProfPorMateriaJpaController implements Serializable {
     }
 
     public void edit(ProfPorMateria profPorMateria) throws NonexistentEntityException, Exception {
-        profPorMateria.getProfPorMateriaPK().setCodMatPorCurso(profPorMateria.getMatPorCurso().getMatPorCursoPK().getCodigo());
-        profPorMateria.getProfPorMateriaPK().setDuiProfesor(profPorMateria.getProfesor().getDui());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            ProfPorMateria persistentProfPorMateria = em.find(ProfPorMateria.class, profPorMateria.getProfPorMateriaPK());
-            MatPorCurso matPorCursoOld = persistentProfPorMateria.getMatPorCurso();
-            MatPorCurso matPorCursoNew = profPorMateria.getMatPorCurso();
-            Profesor profesorOld = persistentProfPorMateria.getProfesor();
-            Profesor profesorNew = profPorMateria.getProfesor();
-            if (matPorCursoNew != null) {
-                matPorCursoNew = em.getReference(matPorCursoNew.getClass(), matPorCursoNew.getMatPorCursoPK());
-                profPorMateria.setMatPorCurso(matPorCursoNew);
+            ProfPorMateria persistentProfPorMateria = em.find(ProfPorMateria.class, profPorMateria.getCodigo());
+            MatPorCurso codMatPorCursoOld = persistentProfPorMateria.getCodMatPorCurso();
+            MatPorCurso codMatPorCursoNew = profPorMateria.getCodMatPorCurso();
+            Profesor duiProfesorOld = persistentProfPorMateria.getDuiProfesor();
+            Profesor duiProfesorNew = profPorMateria.getDuiProfesor();
+            if (codMatPorCursoNew != null) {
+                codMatPorCursoNew = em.getReference(codMatPorCursoNew.getClass(), codMatPorCursoNew.getCodigo());
+                profPorMateria.setCodMatPorCurso(codMatPorCursoNew);
             }
-            if (profesorNew != null) {
-                profesorNew = em.getReference(profesorNew.getClass(), profesorNew.getDui());
-                profPorMateria.setProfesor(profesorNew);
+            if (duiProfesorNew != null) {
+                duiProfesorNew = em.getReference(duiProfesorNew.getClass(), duiProfesorNew.getDui());
+                profPorMateria.setDuiProfesor(duiProfesorNew);
             }
             profPorMateria = em.merge(profPorMateria);
-            if (matPorCursoOld != null && !matPorCursoOld.equals(matPorCursoNew)) {
-                matPorCursoOld.getProfPorMateriaList().remove(profPorMateria);
-                matPorCursoOld = em.merge(matPorCursoOld);
+            if (codMatPorCursoOld != null && !codMatPorCursoOld.equals(codMatPorCursoNew)) {
+                codMatPorCursoOld.getProfPorMateriaList().remove(profPorMateria);
+                codMatPorCursoOld = em.merge(codMatPorCursoOld);
             }
-            if (matPorCursoNew != null && !matPorCursoNew.equals(matPorCursoOld)) {
-                matPorCursoNew.getProfPorMateriaList().add(profPorMateria);
-                matPorCursoNew = em.merge(matPorCursoNew);
+            if (codMatPorCursoNew != null && !codMatPorCursoNew.equals(codMatPorCursoOld)) {
+                codMatPorCursoNew.getProfPorMateriaList().add(profPorMateria);
+                codMatPorCursoNew = em.merge(codMatPorCursoNew);
             }
-            if (profesorOld != null && !profesorOld.equals(profesorNew)) {
-                profesorOld.getProfPorMateriaList().remove(profPorMateria);
-                profesorOld = em.merge(profesorOld);
+            if (duiProfesorOld != null && !duiProfesorOld.equals(duiProfesorNew)) {
+                duiProfesorOld.getProfPorMateriaList().remove(profPorMateria);
+                duiProfesorOld = em.merge(duiProfesorOld);
             }
-            if (profesorNew != null && !profesorNew.equals(profesorOld)) {
-                profesorNew.getProfPorMateriaList().add(profPorMateria);
-                profesorNew = em.merge(profesorNew);
+            if (duiProfesorNew != null && !duiProfesorNew.equals(duiProfesorOld)) {
+                duiProfesorNew.getProfPorMateriaList().add(profPorMateria);
+                duiProfesorNew = em.merge(duiProfesorNew);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                ProfPorMateriaPK id = profPorMateria.getProfPorMateriaPK();
+                Integer id = profPorMateria.getCodigo();
                 if (findProfPorMateria(id) == null) {
                     throw new NonexistentEntityException("The profPorMateria with id " + id + " no longer exists.");
                 }
@@ -131,7 +123,7 @@ public class ProfPorMateriaJpaController implements Serializable {
         }
     }
 
-    public void destroy(ProfPorMateriaPK id) throws NonexistentEntityException {
+    public void destroy(Integer id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -139,19 +131,19 @@ public class ProfPorMateriaJpaController implements Serializable {
             ProfPorMateria profPorMateria;
             try {
                 profPorMateria = em.getReference(ProfPorMateria.class, id);
-                profPorMateria.getProfPorMateriaPK();
+                profPorMateria.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The profPorMateria with id " + id + " no longer exists.", enfe);
             }
-            MatPorCurso matPorCurso = profPorMateria.getMatPorCurso();
-            if (matPorCurso != null) {
-                matPorCurso.getProfPorMateriaList().remove(profPorMateria);
-                matPorCurso = em.merge(matPorCurso);
+            MatPorCurso codMatPorCurso = profPorMateria.getCodMatPorCurso();
+            if (codMatPorCurso != null) {
+                codMatPorCurso.getProfPorMateriaList().remove(profPorMateria);
+                codMatPorCurso = em.merge(codMatPorCurso);
             }
-            Profesor profesor = profPorMateria.getProfesor();
-            if (profesor != null) {
-                profesor.getProfPorMateriaList().remove(profPorMateria);
-                profesor = em.merge(profesor);
+            Profesor duiProfesor = profPorMateria.getDuiProfesor();
+            if (duiProfesor != null) {
+                duiProfesor.getProfPorMateriaList().remove(profPorMateria);
+                duiProfesor = em.merge(duiProfesor);
             }
             em.remove(profPorMateria);
             em.getTransaction().commit();
@@ -186,7 +178,7 @@ public class ProfPorMateriaJpaController implements Serializable {
         }
     }
 
-    public ProfPorMateria findProfPorMateria(ProfPorMateriaPK id) {
+    public ProfPorMateria findProfPorMateria(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(ProfPorMateria.class, id);

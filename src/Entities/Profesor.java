@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "profesor", catalog = "notas", schema = "public")
@@ -39,17 +39,19 @@ public class Profesor implements Serializable {
     @Basic(optional = false)
     @Column(name = "dui")
     private String dui;
+    @Basic(optional = false)
     @Column(name = "apellidos")
     private String apellidos;
     @Basic(optional = false)
     @Column(name = "nombres")
     private String nombres;
+    @Basic(optional = false)
     @Column(name = "activo")
-    private Boolean activo;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "profesor")
-    private List<ProfPorCurso> profPorCursoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "profesor")
+    private boolean activo;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "duiProfesor")
     private List<ProfPorMateria> profPorMateriaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "duiProfesor")
+    private List<Guia> guiaList;
 
     public Profesor() {
     }
@@ -58,9 +60,11 @@ public class Profesor implements Serializable {
         this.dui = dui;
     }
 
-    public Profesor(String dui, String nombres) {
+    public Profesor(String dui, String apellidos, String nombres, boolean activo) {
         this.dui = dui;
+        this.apellidos = apellidos;
         this.nombres = nombres;
+        this.activo = activo;
     }
 
     public String getDui() {
@@ -87,21 +91,12 @@ public class Profesor implements Serializable {
         this.nombres = nombres;
     }
 
-    public Boolean getActivo() {
+    public boolean getActivo() {
         return activo;
     }
 
-    public void setActivo(Boolean activo) {
+    public void setActivo(boolean activo) {
         this.activo = activo;
-    }
-
-    @XmlTransient
-    public List<ProfPorCurso> getProfPorCursoList() {
-        return profPorCursoList;
-    }
-
-    public void setProfPorCursoList(List<ProfPorCurso> profPorCursoList) {
-        this.profPorCursoList = profPorCursoList;
     }
 
     @XmlTransient
@@ -111,6 +106,15 @@ public class Profesor implements Serializable {
 
     public void setProfPorMateriaList(List<ProfPorMateria> profPorMateriaList) {
         this.profPorMateriaList = profPorMateriaList;
+    }
+
+    @XmlTransient
+    public List<Guia> getGuiaList() {
+        return guiaList;
+    }
+
+    public void setGuiaList(List<Guia> guiaList) {
+        this.guiaList = guiaList;
     }
 
     @Override

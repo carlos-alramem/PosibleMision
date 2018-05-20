@@ -6,96 +6,102 @@
 package Entities;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "grado", catalog = "notas", schema = "public")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Grado.findAll", query = "SELECT g FROM Grado g")
-    , @NamedQuery(name = "Grado.findByCodigo", query = "SELECT g FROM Grado g WHERE g.codigo = :codigo")
-    , @NamedQuery(name = "Grado.findByCodSeccion", query = "SELECT g FROM Grado g WHERE g.gradoPK.codSeccion = :codSeccion")
-    , @NamedQuery(name = "Grado.findByCodCurso", query = "SELECT g FROM Grado g WHERE g.gradoPK.codCurso = :codCurso")})
+    , @NamedQuery(name = "Grado.findByCodigo", query = "SELECT g FROM Grado g WHERE g.codigo = :codigo")})
 public class Grado implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected GradoPK gradoPK;
+    @Id
     @Basic(optional = false)
     @Column(name = "codigo")
-    private int codigo;
-    @JoinColumn(name = "cod_curso", referencedColumnName = "codigo", insertable = false, updatable = false)
+    private Integer codigo;
+    @JoinColumn(name = "cod_curso", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private Curso curso;
-    @JoinColumn(name = "cod_seccion", referencedColumnName = "codigo", insertable = false, updatable = false)
+    private Curso codCurso;
+    @JoinColumn(name = "cod_seccion", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private Seccion seccion;
+    private Seccion codSeccion;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "grado1")
+    private Guia guia;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "grado")
+    private List<Matricula> matriculaList;
 
     public Grado() {
     }
 
-    public Grado(GradoPK gradoPK) {
-        this.gradoPK = gradoPK;
-    }
-
-    public Grado(GradoPK gradoPK, int codigo) {
-        this.gradoPK = gradoPK;
+    public Grado(Integer codigo) {
         this.codigo = codigo;
     }
 
-    public Grado(int codSeccion, int codCurso) {
-        this.gradoPK = new GradoPK(codSeccion, codCurso);
-    }
-
-    public GradoPK getGradoPK() {
-        return gradoPK;
-    }
-
-    public void setGradoPK(GradoPK gradoPK) {
-        this.gradoPK = gradoPK;
-    }
-
-    public int getCodigo() {
+    public Integer getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(int codigo) {
+    public void setCodigo(Integer codigo) {
         this.codigo = codigo;
     }
 
-    public Curso getCurso() {
-        return curso;
+    public Curso getCodCurso() {
+        return codCurso;
     }
 
-    public void setCurso(Curso curso) {
-        this.curso = curso;
+    public void setCodCurso(Curso codCurso) {
+        this.codCurso = codCurso;
     }
 
-    public Seccion getSeccion() {
-        return seccion;
+    public Seccion getCodSeccion() {
+        return codSeccion;
     }
 
-    public void setSeccion(Seccion seccion) {
-        this.seccion = seccion;
+    public void setCodSeccion(Seccion codSeccion) {
+        this.codSeccion = codSeccion;
+    }
+
+    public Guia getGuia() {
+        return guia;
+    }
+
+    public void setGuia(Guia guia) {
+        this.guia = guia;
+    }
+
+    @XmlTransient
+    public List<Matricula> getMatriculaList() {
+        return matriculaList;
+    }
+
+    public void setMatriculaList(List<Matricula> matriculaList) {
+        this.matriculaList = matriculaList;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (gradoPK != null ? gradoPK.hashCode() : 0);
+        hash += (codigo != null ? codigo.hashCode() : 0);
         return hash;
     }
 
@@ -106,7 +112,7 @@ public class Grado implements Serializable {
             return false;
         }
         Grado other = (Grado) object;
-        if ((this.gradoPK == null && other.gradoPK != null) || (this.gradoPK != null && !this.gradoPK.equals(other.gradoPK))) {
+        if ((this.codigo == null && other.codigo != null) || (this.codigo != null && !this.codigo.equals(other.codigo))) {
             return false;
         }
         return true;
@@ -114,7 +120,7 @@ public class Grado implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.Grado[ gradoPK=" + gradoPK + " ]";
+        return "Entities.Grado[ codigo=" + codigo + " ]";
     }
     
 }

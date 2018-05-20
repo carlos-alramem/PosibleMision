@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import Entities.Actividad;
 import Entities.Alumno;
 import Entities.Nota;
 import Entities.NotaPK;
@@ -21,7 +22,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class NotaJpaController implements Serializable {
 
@@ -38,17 +39,27 @@ public class NotaJpaController implements Serializable {
         if (nota.getNotaPK() == null) {
             nota.setNotaPK(new NotaPK());
         }
-        nota.getNotaPK().setCodAlumno(nota.getAlumno().getAlumnoPK().getCodigo());
+        nota.getNotaPK().setCodAlumno(nota.getAlumno().getCodigo());
+        nota.getNotaPK().setCodActividad(nota.getActividad().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Actividad actividad = nota.getActividad();
+            if (actividad != null) {
+                actividad = em.getReference(actividad.getClass(), actividad.getCodigo());
+                nota.setActividad(actividad);
+            }
             Alumno alumno = nota.getAlumno();
             if (alumno != null) {
-                alumno = em.getReference(alumno.getClass(), alumno.getAlumnoPK());
+                alumno = em.getReference(alumno.getClass(), alumno.getCodigo());
                 nota.setAlumno(alumno);
             }
             em.persist(nota);
+            if (actividad != null) {
+                actividad.getNotaList().add(nota);
+                actividad = em.merge(actividad);
+            }
             if (alumno != null) {
                 alumno.getNotaList().add(nota);
                 alumno = em.merge(alumno);
@@ -67,19 +78,34 @@ public class NotaJpaController implements Serializable {
     }
 
     public void edit(Nota nota) throws NonexistentEntityException, Exception {
-        nota.getNotaPK().setCodAlumno(nota.getAlumno().getAlumnoPK().getCodigo());
+        nota.getNotaPK().setCodAlumno(nota.getAlumno().getCodigo());
+        nota.getNotaPK().setCodActividad(nota.getActividad().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
             Nota persistentNota = em.find(Nota.class, nota.getNotaPK());
+            Actividad actividadOld = persistentNota.getActividad();
+            Actividad actividadNew = nota.getActividad();
             Alumno alumnoOld = persistentNota.getAlumno();
             Alumno alumnoNew = nota.getAlumno();
+            if (actividadNew != null) {
+                actividadNew = em.getReference(actividadNew.getClass(), actividadNew.getCodigo());
+                nota.setActividad(actividadNew);
+            }
             if (alumnoNew != null) {
-                alumnoNew = em.getReference(alumnoNew.getClass(), alumnoNew.getAlumnoPK());
+                alumnoNew = em.getReference(alumnoNew.getClass(), alumnoNew.getCodigo());
                 nota.setAlumno(alumnoNew);
             }
             nota = em.merge(nota);
+            if (actividadOld != null && !actividadOld.equals(actividadNew)) {
+                actividadOld.getNotaList().remove(nota);
+                actividadOld = em.merge(actividadOld);
+            }
+            if (actividadNew != null && !actividadNew.equals(actividadOld)) {
+                actividadNew.getNotaList().add(nota);
+                actividadNew = em.merge(actividadNew);
+            }
             if (alumnoOld != null && !alumnoOld.equals(alumnoNew)) {
                 alumnoOld.getNotaList().remove(nota);
                 alumnoOld = em.merge(alumnoOld);
@@ -116,6 +142,11 @@ public class NotaJpaController implements Serializable {
                 nota.getNotaPK();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The nota with id " + id + " no longer exists.", enfe);
+            }
+            Actividad actividad = nota.getActividad();
+            if (actividad != null) {
+                actividad.getNotaList().remove(nota);
+                actividad = em.merge(actividad);
             }
             Alumno alumno = nota.getAlumno();
             if (alumno != null) {

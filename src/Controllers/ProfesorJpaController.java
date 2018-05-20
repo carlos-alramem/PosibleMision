@@ -13,17 +13,17 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import Entities.ProfPorCurso;
+import Entities.ProfPorMateria;
 import java.util.ArrayList;
 import java.util.List;
-import Entities.ProfPorMateria;
+import Entities.Guia;
 import Entities.Profesor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class ProfesorJpaController implements Serializable {
 
@@ -37,45 +37,45 @@ public class ProfesorJpaController implements Serializable {
     }
 
     public void create(Profesor profesor) throws PreexistingEntityException, Exception {
-        if (profesor.getProfPorCursoList() == null) {
-            profesor.setProfPorCursoList(new ArrayList<ProfPorCurso>());
-        }
         if (profesor.getProfPorMateriaList() == null) {
             profesor.setProfPorMateriaList(new ArrayList<ProfPorMateria>());
+        }
+        if (profesor.getGuiaList() == null) {
+            profesor.setGuiaList(new ArrayList<Guia>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<ProfPorCurso> attachedProfPorCursoList = new ArrayList<ProfPorCurso>();
-            for (ProfPorCurso profPorCursoListProfPorCursoToAttach : profesor.getProfPorCursoList()) {
-                profPorCursoListProfPorCursoToAttach = em.getReference(profPorCursoListProfPorCursoToAttach.getClass(), profPorCursoListProfPorCursoToAttach.getProfPorCursoPK());
-                attachedProfPorCursoList.add(profPorCursoListProfPorCursoToAttach);
-            }
-            profesor.setProfPorCursoList(attachedProfPorCursoList);
             List<ProfPorMateria> attachedProfPorMateriaList = new ArrayList<ProfPorMateria>();
             for (ProfPorMateria profPorMateriaListProfPorMateriaToAttach : profesor.getProfPorMateriaList()) {
-                profPorMateriaListProfPorMateriaToAttach = em.getReference(profPorMateriaListProfPorMateriaToAttach.getClass(), profPorMateriaListProfPorMateriaToAttach.getProfPorMateriaPK());
+                profPorMateriaListProfPorMateriaToAttach = em.getReference(profPorMateriaListProfPorMateriaToAttach.getClass(), profPorMateriaListProfPorMateriaToAttach.getCodigo());
                 attachedProfPorMateriaList.add(profPorMateriaListProfPorMateriaToAttach);
             }
             profesor.setProfPorMateriaList(attachedProfPorMateriaList);
+            List<Guia> attachedGuiaList = new ArrayList<Guia>();
+            for (Guia guiaListGuiaToAttach : profesor.getGuiaList()) {
+                guiaListGuiaToAttach = em.getReference(guiaListGuiaToAttach.getClass(), guiaListGuiaToAttach.getCodigo());
+                attachedGuiaList.add(guiaListGuiaToAttach);
+            }
+            profesor.setGuiaList(attachedGuiaList);
             em.persist(profesor);
-            for (ProfPorCurso profPorCursoListProfPorCurso : profesor.getProfPorCursoList()) {
-                Profesor oldProfesorOfProfPorCursoListProfPorCurso = profPorCursoListProfPorCurso.getProfesor();
-                profPorCursoListProfPorCurso.setProfesor(profesor);
-                profPorCursoListProfPorCurso = em.merge(profPorCursoListProfPorCurso);
-                if (oldProfesorOfProfPorCursoListProfPorCurso != null) {
-                    oldProfesorOfProfPorCursoListProfPorCurso.getProfPorCursoList().remove(profPorCursoListProfPorCurso);
-                    oldProfesorOfProfPorCursoListProfPorCurso = em.merge(oldProfesorOfProfPorCursoListProfPorCurso);
+            for (ProfPorMateria profPorMateriaListProfPorMateria : profesor.getProfPorMateriaList()) {
+                Profesor oldDuiProfesorOfProfPorMateriaListProfPorMateria = profPorMateriaListProfPorMateria.getDuiProfesor();
+                profPorMateriaListProfPorMateria.setDuiProfesor(profesor);
+                profPorMateriaListProfPorMateria = em.merge(profPorMateriaListProfPorMateria);
+                if (oldDuiProfesorOfProfPorMateriaListProfPorMateria != null) {
+                    oldDuiProfesorOfProfPorMateriaListProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListProfPorMateria);
+                    oldDuiProfesorOfProfPorMateriaListProfPorMateria = em.merge(oldDuiProfesorOfProfPorMateriaListProfPorMateria);
                 }
             }
-            for (ProfPorMateria profPorMateriaListProfPorMateria : profesor.getProfPorMateriaList()) {
-                Profesor oldProfesorOfProfPorMateriaListProfPorMateria = profPorMateriaListProfPorMateria.getProfesor();
-                profPorMateriaListProfPorMateria.setProfesor(profesor);
-                profPorMateriaListProfPorMateria = em.merge(profPorMateriaListProfPorMateria);
-                if (oldProfesorOfProfPorMateriaListProfPorMateria != null) {
-                    oldProfesorOfProfPorMateriaListProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListProfPorMateria);
-                    oldProfesorOfProfPorMateriaListProfPorMateria = em.merge(oldProfesorOfProfPorMateriaListProfPorMateria);
+            for (Guia guiaListGuia : profesor.getGuiaList()) {
+                Profesor oldDuiProfesorOfGuiaListGuia = guiaListGuia.getDuiProfesor();
+                guiaListGuia.setDuiProfesor(profesor);
+                guiaListGuia = em.merge(guiaListGuia);
+                if (oldDuiProfesorOfGuiaListGuia != null) {
+                    oldDuiProfesorOfGuiaListGuia.getGuiaList().remove(guiaListGuia);
+                    oldDuiProfesorOfGuiaListGuia = em.merge(oldDuiProfesorOfGuiaListGuia);
                 }
             }
             em.getTransaction().commit();
@@ -97,64 +97,64 @@ public class ProfesorJpaController implements Serializable {
             em = getEntityManager();
             em.getTransaction().begin();
             Profesor persistentProfesor = em.find(Profesor.class, profesor.getDui());
-            List<ProfPorCurso> profPorCursoListOld = persistentProfesor.getProfPorCursoList();
-            List<ProfPorCurso> profPorCursoListNew = profesor.getProfPorCursoList();
             List<ProfPorMateria> profPorMateriaListOld = persistentProfesor.getProfPorMateriaList();
             List<ProfPorMateria> profPorMateriaListNew = profesor.getProfPorMateriaList();
+            List<Guia> guiaListOld = persistentProfesor.getGuiaList();
+            List<Guia> guiaListNew = profesor.getGuiaList();
             List<String> illegalOrphanMessages = null;
-            for (ProfPorCurso profPorCursoListOldProfPorCurso : profPorCursoListOld) {
-                if (!profPorCursoListNew.contains(profPorCursoListOldProfPorCurso)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain ProfPorCurso " + profPorCursoListOldProfPorCurso + " since its profesor field is not nullable.");
-                }
-            }
             for (ProfPorMateria profPorMateriaListOldProfPorMateria : profPorMateriaListOld) {
                 if (!profPorMateriaListNew.contains(profPorMateriaListOldProfPorMateria)) {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain ProfPorMateria " + profPorMateriaListOldProfPorMateria + " since its profesor field is not nullable.");
+                    illegalOrphanMessages.add("You must retain ProfPorMateria " + profPorMateriaListOldProfPorMateria + " since its duiProfesor field is not nullable.");
+                }
+            }
+            for (Guia guiaListOldGuia : guiaListOld) {
+                if (!guiaListNew.contains(guiaListOldGuia)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain Guia " + guiaListOldGuia + " since its duiProfesor field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
-            List<ProfPorCurso> attachedProfPorCursoListNew = new ArrayList<ProfPorCurso>();
-            for (ProfPorCurso profPorCursoListNewProfPorCursoToAttach : profPorCursoListNew) {
-                profPorCursoListNewProfPorCursoToAttach = em.getReference(profPorCursoListNewProfPorCursoToAttach.getClass(), profPorCursoListNewProfPorCursoToAttach.getProfPorCursoPK());
-                attachedProfPorCursoListNew.add(profPorCursoListNewProfPorCursoToAttach);
-            }
-            profPorCursoListNew = attachedProfPorCursoListNew;
-            profesor.setProfPorCursoList(profPorCursoListNew);
             List<ProfPorMateria> attachedProfPorMateriaListNew = new ArrayList<ProfPorMateria>();
             for (ProfPorMateria profPorMateriaListNewProfPorMateriaToAttach : profPorMateriaListNew) {
-                profPorMateriaListNewProfPorMateriaToAttach = em.getReference(profPorMateriaListNewProfPorMateriaToAttach.getClass(), profPorMateriaListNewProfPorMateriaToAttach.getProfPorMateriaPK());
+                profPorMateriaListNewProfPorMateriaToAttach = em.getReference(profPorMateriaListNewProfPorMateriaToAttach.getClass(), profPorMateriaListNewProfPorMateriaToAttach.getCodigo());
                 attachedProfPorMateriaListNew.add(profPorMateriaListNewProfPorMateriaToAttach);
             }
             profPorMateriaListNew = attachedProfPorMateriaListNew;
             profesor.setProfPorMateriaList(profPorMateriaListNew);
+            List<Guia> attachedGuiaListNew = new ArrayList<Guia>();
+            for (Guia guiaListNewGuiaToAttach : guiaListNew) {
+                guiaListNewGuiaToAttach = em.getReference(guiaListNewGuiaToAttach.getClass(), guiaListNewGuiaToAttach.getCodigo());
+                attachedGuiaListNew.add(guiaListNewGuiaToAttach);
+            }
+            guiaListNew = attachedGuiaListNew;
+            profesor.setGuiaList(guiaListNew);
             profesor = em.merge(profesor);
-            for (ProfPorCurso profPorCursoListNewProfPorCurso : profPorCursoListNew) {
-                if (!profPorCursoListOld.contains(profPorCursoListNewProfPorCurso)) {
-                    Profesor oldProfesorOfProfPorCursoListNewProfPorCurso = profPorCursoListNewProfPorCurso.getProfesor();
-                    profPorCursoListNewProfPorCurso.setProfesor(profesor);
-                    profPorCursoListNewProfPorCurso = em.merge(profPorCursoListNewProfPorCurso);
-                    if (oldProfesorOfProfPorCursoListNewProfPorCurso != null && !oldProfesorOfProfPorCursoListNewProfPorCurso.equals(profesor)) {
-                        oldProfesorOfProfPorCursoListNewProfPorCurso.getProfPorCursoList().remove(profPorCursoListNewProfPorCurso);
-                        oldProfesorOfProfPorCursoListNewProfPorCurso = em.merge(oldProfesorOfProfPorCursoListNewProfPorCurso);
+            for (ProfPorMateria profPorMateriaListNewProfPorMateria : profPorMateriaListNew) {
+                if (!profPorMateriaListOld.contains(profPorMateriaListNewProfPorMateria)) {
+                    Profesor oldDuiProfesorOfProfPorMateriaListNewProfPorMateria = profPorMateriaListNewProfPorMateria.getDuiProfesor();
+                    profPorMateriaListNewProfPorMateria.setDuiProfesor(profesor);
+                    profPorMateriaListNewProfPorMateria = em.merge(profPorMateriaListNewProfPorMateria);
+                    if (oldDuiProfesorOfProfPorMateriaListNewProfPorMateria != null && !oldDuiProfesorOfProfPorMateriaListNewProfPorMateria.equals(profesor)) {
+                        oldDuiProfesorOfProfPorMateriaListNewProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListNewProfPorMateria);
+                        oldDuiProfesorOfProfPorMateriaListNewProfPorMateria = em.merge(oldDuiProfesorOfProfPorMateriaListNewProfPorMateria);
                     }
                 }
             }
-            for (ProfPorMateria profPorMateriaListNewProfPorMateria : profPorMateriaListNew) {
-                if (!profPorMateriaListOld.contains(profPorMateriaListNewProfPorMateria)) {
-                    Profesor oldProfesorOfProfPorMateriaListNewProfPorMateria = profPorMateriaListNewProfPorMateria.getProfesor();
-                    profPorMateriaListNewProfPorMateria.setProfesor(profesor);
-                    profPorMateriaListNewProfPorMateria = em.merge(profPorMateriaListNewProfPorMateria);
-                    if (oldProfesorOfProfPorMateriaListNewProfPorMateria != null && !oldProfesorOfProfPorMateriaListNewProfPorMateria.equals(profesor)) {
-                        oldProfesorOfProfPorMateriaListNewProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListNewProfPorMateria);
-                        oldProfesorOfProfPorMateriaListNewProfPorMateria = em.merge(oldProfesorOfProfPorMateriaListNewProfPorMateria);
+            for (Guia guiaListNewGuia : guiaListNew) {
+                if (!guiaListOld.contains(guiaListNewGuia)) {
+                    Profesor oldDuiProfesorOfGuiaListNewGuia = guiaListNewGuia.getDuiProfesor();
+                    guiaListNewGuia.setDuiProfesor(profesor);
+                    guiaListNewGuia = em.merge(guiaListNewGuia);
+                    if (oldDuiProfesorOfGuiaListNewGuia != null && !oldDuiProfesorOfGuiaListNewGuia.equals(profesor)) {
+                        oldDuiProfesorOfGuiaListNewGuia.getGuiaList().remove(guiaListNewGuia);
+                        oldDuiProfesorOfGuiaListNewGuia = em.merge(oldDuiProfesorOfGuiaListNewGuia);
                     }
                 }
             }
@@ -188,19 +188,19 @@ public class ProfesorJpaController implements Serializable {
                 throw new NonexistentEntityException("The profesor with id " + id + " no longer exists.", enfe);
             }
             List<String> illegalOrphanMessages = null;
-            List<ProfPorCurso> profPorCursoListOrphanCheck = profesor.getProfPorCursoList();
-            for (ProfPorCurso profPorCursoListOrphanCheckProfPorCurso : profPorCursoListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Profesor (" + profesor + ") cannot be destroyed since the ProfPorCurso " + profPorCursoListOrphanCheckProfPorCurso + " in its profPorCursoList field has a non-nullable profesor field.");
-            }
             List<ProfPorMateria> profPorMateriaListOrphanCheck = profesor.getProfPorMateriaList();
             for (ProfPorMateria profPorMateriaListOrphanCheckProfPorMateria : profPorMateriaListOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Profesor (" + profesor + ") cannot be destroyed since the ProfPorMateria " + profPorMateriaListOrphanCheckProfPorMateria + " in its profPorMateriaList field has a non-nullable profesor field.");
+                illegalOrphanMessages.add("This Profesor (" + profesor + ") cannot be destroyed since the ProfPorMateria " + profPorMateriaListOrphanCheckProfPorMateria + " in its profPorMateriaList field has a non-nullable duiProfesor field.");
+            }
+            List<Guia> guiaListOrphanCheck = profesor.getGuiaList();
+            for (Guia guiaListOrphanCheckGuia : guiaListOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Profesor (" + profesor + ") cannot be destroyed since the Guia " + guiaListOrphanCheckGuia + " in its guiaList field has a non-nullable duiProfesor field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);

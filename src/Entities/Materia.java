@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "materia", catalog = "notas", schema = "public")
@@ -40,7 +40,7 @@ public class Materia implements Serializable {
     @Basic(optional = false)
     @Column(name = "nombre")
     private String nombre;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "materia")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "codMateria")
     private List<MatPorCurso> matPorCursoList;
 
     public Materia() {

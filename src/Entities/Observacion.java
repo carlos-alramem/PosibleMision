@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "observacion", catalog = "notas", schema = "public")
@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Observacion.findAll", query = "SELECT o FROM Observacion o")
     , @NamedQuery(name = "Observacion.findByCodigo", query = "SELECT o FROM Observacion o WHERE o.codigo = :codigo")
-    , @NamedQuery(name = "Observacion.findByObservacion", query = "SELECT o FROM Observacion o WHERE o.observacion = :observacion")
+    , @NamedQuery(name = "Observacion.findByDescripcion", query = "SELECT o FROM Observacion o WHERE o.descripcion = :descripcion")
     , @NamedQuery(name = "Observacion.findByGravedad", query = "SELECT o FROM Observacion o WHERE o.gravedad = :gravedad")})
 public class Observacion implements Serializable {
 
@@ -39,8 +39,8 @@ public class Observacion implements Serializable {
     @Column(name = "codigo")
     private Integer codigo;
     @Basic(optional = false)
-    @Column(name = "observacion")
-    private String observacion;
+    @Column(name = "descripcion")
+    private String descripcion;
     @Basic(optional = false)
     @Column(name = "gravedad")
     private int gravedad;
@@ -54,9 +54,9 @@ public class Observacion implements Serializable {
         this.codigo = codigo;
     }
 
-    public Observacion(Integer codigo, String observacion, int gravedad) {
+    public Observacion(Integer codigo, String descripcion, int gravedad) {
         this.codigo = codigo;
-        this.observacion = observacion;
+        this.descripcion = descripcion;
         this.gravedad = gravedad;
     }
 
@@ -68,12 +68,12 @@ public class Observacion implements Serializable {
         this.codigo = codigo;
     }
 
-    public String getObservacion() {
-        return observacion;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setObservacion(String observacion) {
-        this.observacion = observacion;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public int getGravedad() {

@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "matricula", catalog = "notas", schema = "public")
@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Matricula.findAll", query = "SELECT m FROM Matricula m")
     , @NamedQuery(name = "Matricula.findByCodigo", query = "SELECT m FROM Matricula m WHERE m.codigo = :codigo")
     , @NamedQuery(name = "Matricula.findByCodAlumno", query = "SELECT m FROM Matricula m WHERE m.matriculaPK.codAlumno = :codAlumno")
-    , @NamedQuery(name = "Matricula.findByCodProfPorCurso", query = "SELECT m FROM Matricula m WHERE m.matriculaPK.codProfPorCurso = :codProfPorCurso")
+    , @NamedQuery(name = "Matricula.findByCodGrado", query = "SELECT m FROM Matricula m WHERE m.matriculaPK.codGrado = :codGrado")
     , @NamedQuery(name = "Matricula.findByNumLista", query = "SELECT m FROM Matricula m WHERE m.numLista = :numLista")
     , @NamedQuery(name = "Matricula.findByAnio", query = "SELECT m FROM Matricula m WHERE m.matriculaPK.anio = :anio")})
 public class Matricula implements Serializable {
@@ -45,9 +45,9 @@ public class Matricula implements Serializable {
     @JoinColumn(name = "cod_alumno", referencedColumnName = "codigo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Alumno alumno;
-    @JoinColumn(name = "cod_prof_por_curso", referencedColumnName = "codigo", insertable = false, updatable = false)
+    @JoinColumn(name = "cod_grado", referencedColumnName = "codigo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private ProfPorCurso profPorCurso;
+    private Grado grado;
 
     public Matricula() {
     }
@@ -62,8 +62,8 @@ public class Matricula implements Serializable {
         this.numLista = numLista;
     }
 
-    public Matricula(String codAlumno, int codProfPorCurso, int anio) {
-        this.matriculaPK = new MatriculaPK(codAlumno, codProfPorCurso, anio);
+    public Matricula(String codAlumno, int codGrado, int anio) {
+        this.matriculaPK = new MatriculaPK(codAlumno, codGrado, anio);
     }
 
     public MatriculaPK getMatriculaPK() {
@@ -98,12 +98,12 @@ public class Matricula implements Serializable {
         this.alumno = alumno;
     }
 
-    public ProfPorCurso getProfPorCurso() {
-        return profPorCurso;
+    public Grado getGrado() {
+        return grado;
     }
 
-    public void setProfPorCurso(ProfPorCurso profPorCurso) {
-        this.profPorCurso = profPorCurso;
+    public void setGrado(Grado grado) {
+        this.grado = grado;
     }
 
     @Override

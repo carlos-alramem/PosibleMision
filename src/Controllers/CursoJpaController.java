@@ -9,7 +9,6 @@ import Controllers.exceptions.IllegalOrphanException;
 import Controllers.exceptions.NonexistentEntityException;
 import Controllers.exceptions.PreexistingEntityException;
 import Entities.Curso;
-import Entities.CursoPK;
 import java.io.Serializable;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
@@ -24,7 +23,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class CursoJpaController implements Serializable {
 
@@ -38,9 +37,6 @@ public class CursoJpaController implements Serializable {
     }
 
     public void create(Curso curso) throws PreexistingEntityException, Exception {
-        if (curso.getCursoPK() == null) {
-            curso.setCursoPK(new CursoPK());
-        }
         if (curso.getGradoList() == null) {
             curso.setGradoList(new ArrayList<Grado>());
         }
@@ -53,38 +49,38 @@ public class CursoJpaController implements Serializable {
             em.getTransaction().begin();
             List<Grado> attachedGradoList = new ArrayList<Grado>();
             for (Grado gradoListGradoToAttach : curso.getGradoList()) {
-                gradoListGradoToAttach = em.getReference(gradoListGradoToAttach.getClass(), gradoListGradoToAttach.getGradoPK());
+                gradoListGradoToAttach = em.getReference(gradoListGradoToAttach.getClass(), gradoListGradoToAttach.getCodigo());
                 attachedGradoList.add(gradoListGradoToAttach);
             }
             curso.setGradoList(attachedGradoList);
             List<MatPorCurso> attachedMatPorCursoList = new ArrayList<MatPorCurso>();
             for (MatPorCurso matPorCursoListMatPorCursoToAttach : curso.getMatPorCursoList()) {
-                matPorCursoListMatPorCursoToAttach = em.getReference(matPorCursoListMatPorCursoToAttach.getClass(), matPorCursoListMatPorCursoToAttach.getMatPorCursoPK());
+                matPorCursoListMatPorCursoToAttach = em.getReference(matPorCursoListMatPorCursoToAttach.getClass(), matPorCursoListMatPorCursoToAttach.getCodigo());
                 attachedMatPorCursoList.add(matPorCursoListMatPorCursoToAttach);
             }
             curso.setMatPorCursoList(attachedMatPorCursoList);
             em.persist(curso);
             for (Grado gradoListGrado : curso.getGradoList()) {
-                Curso oldCursoOfGradoListGrado = gradoListGrado.getCurso();
-                gradoListGrado.setCurso(curso);
+                Curso oldCodCursoOfGradoListGrado = gradoListGrado.getCodCurso();
+                gradoListGrado.setCodCurso(curso);
                 gradoListGrado = em.merge(gradoListGrado);
-                if (oldCursoOfGradoListGrado != null) {
-                    oldCursoOfGradoListGrado.getGradoList().remove(gradoListGrado);
-                    oldCursoOfGradoListGrado = em.merge(oldCursoOfGradoListGrado);
+                if (oldCodCursoOfGradoListGrado != null) {
+                    oldCodCursoOfGradoListGrado.getGradoList().remove(gradoListGrado);
+                    oldCodCursoOfGradoListGrado = em.merge(oldCodCursoOfGradoListGrado);
                 }
             }
             for (MatPorCurso matPorCursoListMatPorCurso : curso.getMatPorCursoList()) {
-                Curso oldCursoOfMatPorCursoListMatPorCurso = matPorCursoListMatPorCurso.getCurso();
-                matPorCursoListMatPorCurso.setCurso(curso);
+                Curso oldCodCursoOfMatPorCursoListMatPorCurso = matPorCursoListMatPorCurso.getCodCurso();
+                matPorCursoListMatPorCurso.setCodCurso(curso);
                 matPorCursoListMatPorCurso = em.merge(matPorCursoListMatPorCurso);
-                if (oldCursoOfMatPorCursoListMatPorCurso != null) {
-                    oldCursoOfMatPorCursoListMatPorCurso.getMatPorCursoList().remove(matPorCursoListMatPorCurso);
-                    oldCursoOfMatPorCursoListMatPorCurso = em.merge(oldCursoOfMatPorCursoListMatPorCurso);
+                if (oldCodCursoOfMatPorCursoListMatPorCurso != null) {
+                    oldCodCursoOfMatPorCursoListMatPorCurso.getMatPorCursoList().remove(matPorCursoListMatPorCurso);
+                    oldCodCursoOfMatPorCursoListMatPorCurso = em.merge(oldCodCursoOfMatPorCursoListMatPorCurso);
                 }
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findCurso(curso.getCursoPK()) != null) {
+            if (findCurso(curso.getCodigo()) != null) {
                 throw new PreexistingEntityException("Curso " + curso + " already exists.", ex);
             }
             throw ex;
@@ -100,7 +96,7 @@ public class CursoJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Curso persistentCurso = em.find(Curso.class, curso.getCursoPK());
+            Curso persistentCurso = em.find(Curso.class, curso.getCodigo());
             List<Grado> gradoListOld = persistentCurso.getGradoList();
             List<Grado> gradoListNew = curso.getGradoList();
             List<MatPorCurso> matPorCursoListOld = persistentCurso.getMatPorCursoList();
@@ -111,7 +107,7 @@ public class CursoJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Grado " + gradoListOldGrado + " since its curso field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Grado " + gradoListOldGrado + " since its codCurso field is not nullable.");
                 }
             }
             for (MatPorCurso matPorCursoListOldMatPorCurso : matPorCursoListOld) {
@@ -119,7 +115,7 @@ public class CursoJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain MatPorCurso " + matPorCursoListOldMatPorCurso + " since its curso field is not nullable.");
+                    illegalOrphanMessages.add("You must retain MatPorCurso " + matPorCursoListOldMatPorCurso + " since its codCurso field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -127,14 +123,14 @@ public class CursoJpaController implements Serializable {
             }
             List<Grado> attachedGradoListNew = new ArrayList<Grado>();
             for (Grado gradoListNewGradoToAttach : gradoListNew) {
-                gradoListNewGradoToAttach = em.getReference(gradoListNewGradoToAttach.getClass(), gradoListNewGradoToAttach.getGradoPK());
+                gradoListNewGradoToAttach = em.getReference(gradoListNewGradoToAttach.getClass(), gradoListNewGradoToAttach.getCodigo());
                 attachedGradoListNew.add(gradoListNewGradoToAttach);
             }
             gradoListNew = attachedGradoListNew;
             curso.setGradoList(gradoListNew);
             List<MatPorCurso> attachedMatPorCursoListNew = new ArrayList<MatPorCurso>();
             for (MatPorCurso matPorCursoListNewMatPorCursoToAttach : matPorCursoListNew) {
-                matPorCursoListNewMatPorCursoToAttach = em.getReference(matPorCursoListNewMatPorCursoToAttach.getClass(), matPorCursoListNewMatPorCursoToAttach.getMatPorCursoPK());
+                matPorCursoListNewMatPorCursoToAttach = em.getReference(matPorCursoListNewMatPorCursoToAttach.getClass(), matPorCursoListNewMatPorCursoToAttach.getCodigo());
                 attachedMatPorCursoListNew.add(matPorCursoListNewMatPorCursoToAttach);
             }
             matPorCursoListNew = attachedMatPorCursoListNew;
@@ -142,23 +138,23 @@ public class CursoJpaController implements Serializable {
             curso = em.merge(curso);
             for (Grado gradoListNewGrado : gradoListNew) {
                 if (!gradoListOld.contains(gradoListNewGrado)) {
-                    Curso oldCursoOfGradoListNewGrado = gradoListNewGrado.getCurso();
-                    gradoListNewGrado.setCurso(curso);
+                    Curso oldCodCursoOfGradoListNewGrado = gradoListNewGrado.getCodCurso();
+                    gradoListNewGrado.setCodCurso(curso);
                     gradoListNewGrado = em.merge(gradoListNewGrado);
-                    if (oldCursoOfGradoListNewGrado != null && !oldCursoOfGradoListNewGrado.equals(curso)) {
-                        oldCursoOfGradoListNewGrado.getGradoList().remove(gradoListNewGrado);
-                        oldCursoOfGradoListNewGrado = em.merge(oldCursoOfGradoListNewGrado);
+                    if (oldCodCursoOfGradoListNewGrado != null && !oldCodCursoOfGradoListNewGrado.equals(curso)) {
+                        oldCodCursoOfGradoListNewGrado.getGradoList().remove(gradoListNewGrado);
+                        oldCodCursoOfGradoListNewGrado = em.merge(oldCodCursoOfGradoListNewGrado);
                     }
                 }
             }
             for (MatPorCurso matPorCursoListNewMatPorCurso : matPorCursoListNew) {
                 if (!matPorCursoListOld.contains(matPorCursoListNewMatPorCurso)) {
-                    Curso oldCursoOfMatPorCursoListNewMatPorCurso = matPorCursoListNewMatPorCurso.getCurso();
-                    matPorCursoListNewMatPorCurso.setCurso(curso);
+                    Curso oldCodCursoOfMatPorCursoListNewMatPorCurso = matPorCursoListNewMatPorCurso.getCodCurso();
+                    matPorCursoListNewMatPorCurso.setCodCurso(curso);
                     matPorCursoListNewMatPorCurso = em.merge(matPorCursoListNewMatPorCurso);
-                    if (oldCursoOfMatPorCursoListNewMatPorCurso != null && !oldCursoOfMatPorCursoListNewMatPorCurso.equals(curso)) {
-                        oldCursoOfMatPorCursoListNewMatPorCurso.getMatPorCursoList().remove(matPorCursoListNewMatPorCurso);
-                        oldCursoOfMatPorCursoListNewMatPorCurso = em.merge(oldCursoOfMatPorCursoListNewMatPorCurso);
+                    if (oldCodCursoOfMatPorCursoListNewMatPorCurso != null && !oldCodCursoOfMatPorCursoListNewMatPorCurso.equals(curso)) {
+                        oldCodCursoOfMatPorCursoListNewMatPorCurso.getMatPorCursoList().remove(matPorCursoListNewMatPorCurso);
+                        oldCodCursoOfMatPorCursoListNewMatPorCurso = em.merge(oldCodCursoOfMatPorCursoListNewMatPorCurso);
                     }
                 }
             }
@@ -166,7 +162,7 @@ public class CursoJpaController implements Serializable {
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                CursoPK id = curso.getCursoPK();
+                Integer id = curso.getCodigo();
                 if (findCurso(id) == null) {
                     throw new NonexistentEntityException("The curso with id " + id + " no longer exists.");
                 }
@@ -179,7 +175,7 @@ public class CursoJpaController implements Serializable {
         }
     }
 
-    public void destroy(CursoPK id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -187,7 +183,7 @@ public class CursoJpaController implements Serializable {
             Curso curso;
             try {
                 curso = em.getReference(Curso.class, id);
-                curso.getCursoPK();
+                curso.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The curso with id " + id + " no longer exists.", enfe);
             }
@@ -197,14 +193,14 @@ public class CursoJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Curso (" + curso + ") cannot be destroyed since the Grado " + gradoListOrphanCheckGrado + " in its gradoList field has a non-nullable curso field.");
+                illegalOrphanMessages.add("This Curso (" + curso + ") cannot be destroyed since the Grado " + gradoListOrphanCheckGrado + " in its gradoList field has a non-nullable codCurso field.");
             }
             List<MatPorCurso> matPorCursoListOrphanCheck = curso.getMatPorCursoList();
             for (MatPorCurso matPorCursoListOrphanCheckMatPorCurso : matPorCursoListOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Curso (" + curso + ") cannot be destroyed since the MatPorCurso " + matPorCursoListOrphanCheckMatPorCurso + " in its matPorCursoList field has a non-nullable curso field.");
+                illegalOrphanMessages.add("This Curso (" + curso + ") cannot be destroyed since the MatPorCurso " + matPorCursoListOrphanCheckMatPorCurso + " in its matPorCursoList field has a non-nullable codCurso field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
@@ -242,7 +238,7 @@ public class CursoJpaController implements Serializable {
         }
     }
 
-    public Curso findCurso(CursoPK id) {
+    public Curso findCurso(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Curso.class, id);

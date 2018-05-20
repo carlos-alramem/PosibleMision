@@ -6,6 +6,7 @@
 package Entities;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -17,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "obs_por_alumno", catalog = "notas", schema = "public")
@@ -25,15 +26,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "ObsPorAlumno.findAll", query = "SELECT o FROM ObsPorAlumno o")
     , @NamedQuery(name = "ObsPorAlumno.findByCodAlumno", query = "SELECT o FROM ObsPorAlumno o WHERE o.obsPorAlumnoPK.codAlumno = :codAlumno")
-    , @NamedQuery(name = "ObsPorAlumno.findByCodObs", query = "SELECT o FROM ObsPorAlumno o WHERE o.obsPorAlumnoPK.codObs = :codObs")
+    , @NamedQuery(name = "ObsPorAlumno.findByCodObservacion", query = "SELECT o FROM ObsPorAlumno o WHERE o.obsPorAlumnoPK.codObservacion = :codObservacion")
     , @NamedQuery(name = "ObsPorAlumno.findByMes", query = "SELECT o FROM ObsPorAlumno o WHERE o.obsPorAlumnoPK.mes = :mes")
-    , @NamedQuery(name = "ObsPorAlumno.findByAnio", query = "SELECT o FROM ObsPorAlumno o WHERE o.obsPorAlumnoPK.anio = :anio")})
+    , @NamedQuery(name = "ObsPorAlumno.findByAnio", query = "SELECT o FROM ObsPorAlumno o WHERE o.anio = :anio")})
 public class ObsPorAlumno implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected ObsPorAlumnoPK obsPorAlumnoPK;
-    @JoinColumn(name = "cod_obs", referencedColumnName = "codigo", insertable = false, updatable = false)
+    @Column(name = "anio")
+    private Integer anio;
+    @JoinColumn(name = "cod_alumno", referencedColumnName = "codigo", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private Alumno alumno;
+    @JoinColumn(name = "cod_observacion", referencedColumnName = "codigo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Observacion observacion;
 
@@ -44,8 +50,8 @@ public class ObsPorAlumno implements Serializable {
         this.obsPorAlumnoPK = obsPorAlumnoPK;
     }
 
-    public ObsPorAlumno(String codAlumno, int codObs, int mes, int anio) {
-        this.obsPorAlumnoPK = new ObsPorAlumnoPK(codAlumno, codObs, mes, anio);
+    public ObsPorAlumno(String codAlumno, int codObservacion, int mes) {
+        this.obsPorAlumnoPK = new ObsPorAlumnoPK(codAlumno, codObservacion, mes);
     }
 
     public ObsPorAlumnoPK getObsPorAlumnoPK() {
@@ -54,6 +60,22 @@ public class ObsPorAlumno implements Serializable {
 
     public void setObsPorAlumnoPK(ObsPorAlumnoPK obsPorAlumnoPK) {
         this.obsPorAlumnoPK = obsPorAlumnoPK;
+    }
+
+    public Integer getAnio() {
+        return anio;
+    }
+
+    public void setAnio(Integer anio) {
+        this.anio = anio;
+    }
+
+    public Alumno getAlumno() {
+        return alumno;
+    }
+
+    public void setAlumno(Alumno alumno) {
+        this.alumno = alumno;
     }
 
     public Observacion getObservacion() {

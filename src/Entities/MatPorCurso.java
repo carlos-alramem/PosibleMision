@@ -7,9 +7,11 @@ package Entities;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -21,65 +23,61 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "mat_por_curso", catalog = "notas", schema = "public")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "MatPorCurso.findAll", query = "SELECT m FROM MatPorCurso m")
-    , @NamedQuery(name = "MatPorCurso.findByCodigo", query = "SELECT m FROM MatPorCurso m WHERE m.matPorCursoPK.codigo = :codigo")
-    , @NamedQuery(name = "MatPorCurso.findByCodCurso", query = "SELECT m FROM MatPorCurso m WHERE m.matPorCursoPK.codCurso = :codCurso")
-    , @NamedQuery(name = "MatPorCurso.findByCodMateria", query = "SELECT m FROM MatPorCurso m WHERE m.matPorCursoPK.codMateria = :codMateria")})
+    , @NamedQuery(name = "MatPorCurso.findByCodigo", query = "SELECT m FROM MatPorCurso m WHERE m.codigo = :codigo")})
 public class MatPorCurso implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected MatPorCursoPK matPorCursoPK;
-    @JoinColumn(name = "cod_curso", referencedColumnName = "codigo", insertable = false, updatable = false)
+    @Id
+    @Basic(optional = false)
+    @Column(name = "codigo")
+    private Integer codigo;
+    @JoinColumn(name = "cod_curso", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private Curso curso;
-    @JoinColumn(name = "cod_materia", referencedColumnName = "codigo", insertable = false, updatable = false)
+    private Curso codCurso;
+    @JoinColumn(name = "cod_materia", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private Materia materia;
+    private Materia codMateria;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "codMatCurso")
     private List<Actividad> actividadList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "matPorCurso")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "codMatPorCurso")
     private List<ProfPorMateria> profPorMateriaList;
 
     public MatPorCurso() {
     }
 
-    public MatPorCurso(MatPorCursoPK matPorCursoPK) {
-        this.matPorCursoPK = matPorCursoPK;
+    public MatPorCurso(Integer codigo) {
+        this.codigo = codigo;
     }
 
-    public MatPorCurso(int codigo, int codCurso, int codMateria) {
-        this.matPorCursoPK = new MatPorCursoPK(codigo, codCurso, codMateria);
+    public Integer getCodigo() {
+        return codigo;
     }
 
-    public MatPorCursoPK getMatPorCursoPK() {
-        return matPorCursoPK;
+    public void setCodigo(Integer codigo) {
+        this.codigo = codigo;
     }
 
-    public void setMatPorCursoPK(MatPorCursoPK matPorCursoPK) {
-        this.matPorCursoPK = matPorCursoPK;
+    public Curso getCodCurso() {
+        return codCurso;
     }
 
-    public Curso getCurso() {
-        return curso;
+    public void setCodCurso(Curso codCurso) {
+        this.codCurso = codCurso;
     }
 
-    public void setCurso(Curso curso) {
-        this.curso = curso;
+    public Materia getCodMateria() {
+        return codMateria;
     }
 
-    public Materia getMateria() {
-        return materia;
-    }
-
-    public void setMateria(Materia materia) {
-        this.materia = materia;
+    public void setCodMateria(Materia codMateria) {
+        this.codMateria = codMateria;
     }
 
     @XmlTransient
@@ -103,7 +101,7 @@ public class MatPorCurso implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (matPorCursoPK != null ? matPorCursoPK.hashCode() : 0);
+        hash += (codigo != null ? codigo.hashCode() : 0);
         return hash;
     }
 
@@ -114,7 +112,7 @@ public class MatPorCurso implements Serializable {
             return false;
         }
         MatPorCurso other = (MatPorCurso) object;
-        if ((this.matPorCursoPK == null && other.matPorCursoPK != null) || (this.matPorCursoPK != null && !this.matPorCursoPK.equals(other.matPorCursoPK))) {
+        if ((this.codigo == null && other.codigo != null) || (this.codigo != null && !this.codigo.equals(other.codigo))) {
             return false;
         }
         return true;
@@ -122,7 +120,7 @@ public class MatPorCurso implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.MatPorCurso[ matPorCursoPK=" + matPorCursoPK + " ]";
+        return "Entities.MatPorCurso[ codigo=" + codigo + " ]";
     }
     
 }

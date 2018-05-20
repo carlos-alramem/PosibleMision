@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "nivel", catalog = "notas", schema = "public")
@@ -40,8 +40,10 @@ public class Nivel implements Serializable {
     @Basic(optional = false)
     @Column(name = "nombre")
     private String nombre;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nivel1")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nivel")
     private List<Promedio> promedioList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nivel")
+    private List<PorcentPorMes> porcentPorMesList;
 
     public Nivel() {
     }
@@ -78,6 +80,15 @@ public class Nivel implements Serializable {
 
     public void setPromedioList(List<Promedio> promedioList) {
         this.promedioList = promedioList;
+    }
+
+    @XmlTransient
+    public List<PorcentPorMes> getPorcentPorMesList() {
+        return porcentPorMesList;
+    }
+
+    public void setPorcentPorMesList(List<PorcentPorMes> porcentPorMesList) {
+        this.porcentPorMesList = porcentPorMesList;
     }
 
     @Override

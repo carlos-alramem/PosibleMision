@@ -13,16 +13,16 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import Entities.Alumno;
+import Entities.Grado;
 import Entities.Matricula;
 import Entities.MatriculaPK;
-import Entities.ProfPorCurso;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class MatriculaJpaController implements Serializable {
 
@@ -39,30 +39,30 @@ public class MatriculaJpaController implements Serializable {
         if (matricula.getMatriculaPK() == null) {
             matricula.setMatriculaPK(new MatriculaPK());
         }
-        matricula.getMatriculaPK().setCodAlumno(matricula.getAlumno().getAlumnoPK().getCodigo());
-        matricula.getMatriculaPK().setCodProfPorCurso(matricula.getProfPorCurso().getCodigo());
+        matricula.getMatriculaPK().setCodAlumno(matricula.getAlumno().getCodigo());
+        matricula.getMatriculaPK().setCodGrado(matricula.getGrado().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
             Alumno alumno = matricula.getAlumno();
             if (alumno != null) {
-                alumno = em.getReference(alumno.getClass(), alumno.getAlumnoPK());
+                alumno = em.getReference(alumno.getClass(), alumno.getCodigo());
                 matricula.setAlumno(alumno);
             }
-            ProfPorCurso profPorCurso = matricula.getProfPorCurso();
-            if (profPorCurso != null) {
-                profPorCurso = em.getReference(profPorCurso.getClass(), profPorCurso.getProfPorCursoPK());
-                matricula.setProfPorCurso(profPorCurso);
+            Grado grado = matricula.getGrado();
+            if (grado != null) {
+                grado = em.getReference(grado.getClass(), grado.getCodigo());
+                matricula.setGrado(grado);
             }
             em.persist(matricula);
             if (alumno != null) {
                 alumno.getMatriculaList().add(matricula);
                 alumno = em.merge(alumno);
             }
-            if (profPorCurso != null) {
-                profPorCurso.getMatriculaList().add(matricula);
-                profPorCurso = em.merge(profPorCurso);
+            if (grado != null) {
+                grado.getMatriculaList().add(matricula);
+                grado = em.merge(grado);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -78,8 +78,8 @@ public class MatriculaJpaController implements Serializable {
     }
 
     public void edit(Matricula matricula) throws NonexistentEntityException, Exception {
-        matricula.getMatriculaPK().setCodAlumno(matricula.getAlumno().getAlumnoPK().getCodigo());
-        matricula.getMatriculaPK().setCodProfPorCurso(matricula.getProfPorCurso().getCodigo());
+        matricula.getMatriculaPK().setCodAlumno(matricula.getAlumno().getCodigo());
+        matricula.getMatriculaPK().setCodGrado(matricula.getGrado().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -87,15 +87,15 @@ public class MatriculaJpaController implements Serializable {
             Matricula persistentMatricula = em.find(Matricula.class, matricula.getMatriculaPK());
             Alumno alumnoOld = persistentMatricula.getAlumno();
             Alumno alumnoNew = matricula.getAlumno();
-            ProfPorCurso profPorCursoOld = persistentMatricula.getProfPorCurso();
-            ProfPorCurso profPorCursoNew = matricula.getProfPorCurso();
+            Grado gradoOld = persistentMatricula.getGrado();
+            Grado gradoNew = matricula.getGrado();
             if (alumnoNew != null) {
-                alumnoNew = em.getReference(alumnoNew.getClass(), alumnoNew.getAlumnoPK());
+                alumnoNew = em.getReference(alumnoNew.getClass(), alumnoNew.getCodigo());
                 matricula.setAlumno(alumnoNew);
             }
-            if (profPorCursoNew != null) {
-                profPorCursoNew = em.getReference(profPorCursoNew.getClass(), profPorCursoNew.getProfPorCursoPK());
-                matricula.setProfPorCurso(profPorCursoNew);
+            if (gradoNew != null) {
+                gradoNew = em.getReference(gradoNew.getClass(), gradoNew.getCodigo());
+                matricula.setGrado(gradoNew);
             }
             matricula = em.merge(matricula);
             if (alumnoOld != null && !alumnoOld.equals(alumnoNew)) {
@@ -106,13 +106,13 @@ public class MatriculaJpaController implements Serializable {
                 alumnoNew.getMatriculaList().add(matricula);
                 alumnoNew = em.merge(alumnoNew);
             }
-            if (profPorCursoOld != null && !profPorCursoOld.equals(profPorCursoNew)) {
-                profPorCursoOld.getMatriculaList().remove(matricula);
-                profPorCursoOld = em.merge(profPorCursoOld);
+            if (gradoOld != null && !gradoOld.equals(gradoNew)) {
+                gradoOld.getMatriculaList().remove(matricula);
+                gradoOld = em.merge(gradoOld);
             }
-            if (profPorCursoNew != null && !profPorCursoNew.equals(profPorCursoOld)) {
-                profPorCursoNew.getMatriculaList().add(matricula);
-                profPorCursoNew = em.merge(profPorCursoNew);
+            if (gradoNew != null && !gradoNew.equals(gradoOld)) {
+                gradoNew.getMatriculaList().add(matricula);
+                gradoNew = em.merge(gradoNew);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -148,10 +148,10 @@ public class MatriculaJpaController implements Serializable {
                 alumno.getMatriculaList().remove(matricula);
                 alumno = em.merge(alumno);
             }
-            ProfPorCurso profPorCurso = matricula.getProfPorCurso();
-            if (profPorCurso != null) {
-                profPorCurso.getMatriculaList().remove(matricula);
-                profPorCurso = em.merge(profPorCurso);
+            Grado grado = matricula.getGrado();
+            if (grado != null) {
+                grado.getMatriculaList().remove(matricula);
+                grado = em.merge(grado);
             }
             em.remove(matricula);
             em.getTransaction().commit();

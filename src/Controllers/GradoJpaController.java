@@ -5,6 +5,7 @@
  */
 package Controllers;
 
+import Controllers.exceptions.IllegalOrphanException;
 import Controllers.exceptions.NonexistentEntityException;
 import Controllers.exceptions.PreexistingEntityException;
 import java.io.Serializable;
@@ -14,15 +15,17 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import Entities.Curso;
 import Entities.Grado;
-import Entities.GradoPK;
 import Entities.Seccion;
+import Entities.Guia;
+import Entities.Matricula;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class GradoJpaController implements Serializable {
 
@@ -36,37 +39,64 @@ public class GradoJpaController implements Serializable {
     }
 
     public void create(Grado grado) throws PreexistingEntityException, Exception {
-        if (grado.getGradoPK() == null) {
-            grado.setGradoPK(new GradoPK());
+        if (grado.getMatriculaList() == null) {
+            grado.setMatriculaList(new ArrayList<Matricula>());
         }
-        grado.getGradoPK().setCodSeccion(grado.getSeccion().getSeccionPK().getCodigo());
-        grado.getGradoPK().setCodCurso(grado.getCurso().getCursoPK().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Curso curso = grado.getCurso();
-            if (curso != null) {
-                curso = em.getReference(curso.getClass(), curso.getCursoPK());
-                grado.setCurso(curso);
+            Curso codCurso = grado.getCodCurso();
+            if (codCurso != null) {
+                codCurso = em.getReference(codCurso.getClass(), codCurso.getCodigo());
+                grado.setCodCurso(codCurso);
             }
-            Seccion seccion = grado.getSeccion();
-            if (seccion != null) {
-                seccion = em.getReference(seccion.getClass(), seccion.getSeccionPK());
-                grado.setSeccion(seccion);
+            Seccion codSeccion = grado.getCodSeccion();
+            if (codSeccion != null) {
+                codSeccion = em.getReference(codSeccion.getClass(), codSeccion.getCodigo());
+                grado.setCodSeccion(codSeccion);
             }
+            Guia guia = grado.getGuia();
+            if (guia != null) {
+                guia = em.getReference(guia.getClass(), guia.getCodigo());
+                grado.setGuia(guia);
+            }
+            List<Matricula> attachedMatriculaList = new ArrayList<Matricula>();
+            for (Matricula matriculaListMatriculaToAttach : grado.getMatriculaList()) {
+                matriculaListMatriculaToAttach = em.getReference(matriculaListMatriculaToAttach.getClass(), matriculaListMatriculaToAttach.getMatriculaPK());
+                attachedMatriculaList.add(matriculaListMatriculaToAttach);
+            }
+            grado.setMatriculaList(attachedMatriculaList);
             em.persist(grado);
-            if (curso != null) {
-                curso.getGradoList().add(grado);
-                curso = em.merge(curso);
+            if (codCurso != null) {
+                codCurso.getGradoList().add(grado);
+                codCurso = em.merge(codCurso);
             }
-            if (seccion != null) {
-                seccion.getGradoList().add(grado);
-                seccion = em.merge(seccion);
+            if (codSeccion != null) {
+                codSeccion.getGradoList().add(grado);
+                codSeccion = em.merge(codSeccion);
+            }
+            if (guia != null) {
+                Grado oldGrado1OfGuia = guia.getGrado1();
+                if (oldGrado1OfGuia != null) {
+                    oldGrado1OfGuia.setGuia(null);
+                    oldGrado1OfGuia = em.merge(oldGrado1OfGuia);
+                }
+                guia.setGrado1(grado);
+                guia = em.merge(guia);
+            }
+            for (Matricula matriculaListMatricula : grado.getMatriculaList()) {
+                Grado oldGradoOfMatriculaListMatricula = matriculaListMatricula.getGrado();
+                matriculaListMatricula.setGrado(grado);
+                matriculaListMatricula = em.merge(matriculaListMatricula);
+                if (oldGradoOfMatriculaListMatricula != null) {
+                    oldGradoOfMatriculaListMatricula.getMatriculaList().remove(matriculaListMatricula);
+                    oldGradoOfMatriculaListMatricula = em.merge(oldGradoOfMatriculaListMatricula);
+                }
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findGrado(grado.getGradoPK()) != null) {
+            if (findGrado(grado.getCodigo()) != null) {
                 throw new PreexistingEntityException("Grado " + grado + " already exists.", ex);
             }
             throw ex;
@@ -77,48 +107,99 @@ public class GradoJpaController implements Serializable {
         }
     }
 
-    public void edit(Grado grado) throws NonexistentEntityException, Exception {
-        grado.getGradoPK().setCodSeccion(grado.getSeccion().getSeccionPK().getCodigo());
-        grado.getGradoPK().setCodCurso(grado.getCurso().getCursoPK().getCodigo());
+    public void edit(Grado grado) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Grado persistentGrado = em.find(Grado.class, grado.getGradoPK());
-            Curso cursoOld = persistentGrado.getCurso();
-            Curso cursoNew = grado.getCurso();
-            Seccion seccionOld = persistentGrado.getSeccion();
-            Seccion seccionNew = grado.getSeccion();
-            if (cursoNew != null) {
-                cursoNew = em.getReference(cursoNew.getClass(), cursoNew.getCursoPK());
-                grado.setCurso(cursoNew);
+            Grado persistentGrado = em.find(Grado.class, grado.getCodigo());
+            Curso codCursoOld = persistentGrado.getCodCurso();
+            Curso codCursoNew = grado.getCodCurso();
+            Seccion codSeccionOld = persistentGrado.getCodSeccion();
+            Seccion codSeccionNew = grado.getCodSeccion();
+            Guia guiaOld = persistentGrado.getGuia();
+            Guia guiaNew = grado.getGuia();
+            List<Matricula> matriculaListOld = persistentGrado.getMatriculaList();
+            List<Matricula> matriculaListNew = grado.getMatriculaList();
+            List<String> illegalOrphanMessages = null;
+            if (guiaOld != null && !guiaOld.equals(guiaNew)) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("You must retain Guia " + guiaOld + " since its grado1 field is not nullable.");
             }
-            if (seccionNew != null) {
-                seccionNew = em.getReference(seccionNew.getClass(), seccionNew.getSeccionPK());
-                grado.setSeccion(seccionNew);
+            for (Matricula matriculaListOldMatricula : matriculaListOld) {
+                if (!matriculaListNew.contains(matriculaListOldMatricula)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain Matricula " + matriculaListOldMatricula + " since its grado field is not nullable.");
+                }
             }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
+            }
+            if (codCursoNew != null) {
+                codCursoNew = em.getReference(codCursoNew.getClass(), codCursoNew.getCodigo());
+                grado.setCodCurso(codCursoNew);
+            }
+            if (codSeccionNew != null) {
+                codSeccionNew = em.getReference(codSeccionNew.getClass(), codSeccionNew.getCodigo());
+                grado.setCodSeccion(codSeccionNew);
+            }
+            if (guiaNew != null) {
+                guiaNew = em.getReference(guiaNew.getClass(), guiaNew.getCodigo());
+                grado.setGuia(guiaNew);
+            }
+            List<Matricula> attachedMatriculaListNew = new ArrayList<Matricula>();
+            for (Matricula matriculaListNewMatriculaToAttach : matriculaListNew) {
+                matriculaListNewMatriculaToAttach = em.getReference(matriculaListNewMatriculaToAttach.getClass(), matriculaListNewMatriculaToAttach.getMatriculaPK());
+                attachedMatriculaListNew.add(matriculaListNewMatriculaToAttach);
+            }
+            matriculaListNew = attachedMatriculaListNew;
+            grado.setMatriculaList(matriculaListNew);
             grado = em.merge(grado);
-            if (cursoOld != null && !cursoOld.equals(cursoNew)) {
-                cursoOld.getGradoList().remove(grado);
-                cursoOld = em.merge(cursoOld);
+            if (codCursoOld != null && !codCursoOld.equals(codCursoNew)) {
+                codCursoOld.getGradoList().remove(grado);
+                codCursoOld = em.merge(codCursoOld);
             }
-            if (cursoNew != null && !cursoNew.equals(cursoOld)) {
-                cursoNew.getGradoList().add(grado);
-                cursoNew = em.merge(cursoNew);
+            if (codCursoNew != null && !codCursoNew.equals(codCursoOld)) {
+                codCursoNew.getGradoList().add(grado);
+                codCursoNew = em.merge(codCursoNew);
             }
-            if (seccionOld != null && !seccionOld.equals(seccionNew)) {
-                seccionOld.getGradoList().remove(grado);
-                seccionOld = em.merge(seccionOld);
+            if (codSeccionOld != null && !codSeccionOld.equals(codSeccionNew)) {
+                codSeccionOld.getGradoList().remove(grado);
+                codSeccionOld = em.merge(codSeccionOld);
             }
-            if (seccionNew != null && !seccionNew.equals(seccionOld)) {
-                seccionNew.getGradoList().add(grado);
-                seccionNew = em.merge(seccionNew);
+            if (codSeccionNew != null && !codSeccionNew.equals(codSeccionOld)) {
+                codSeccionNew.getGradoList().add(grado);
+                codSeccionNew = em.merge(codSeccionNew);
+            }
+            if (guiaNew != null && !guiaNew.equals(guiaOld)) {
+                Grado oldGrado1OfGuia = guiaNew.getGrado1();
+                if (oldGrado1OfGuia != null) {
+                    oldGrado1OfGuia.setGuia(null);
+                    oldGrado1OfGuia = em.merge(oldGrado1OfGuia);
+                }
+                guiaNew.setGrado1(grado);
+                guiaNew = em.merge(guiaNew);
+            }
+            for (Matricula matriculaListNewMatricula : matriculaListNew) {
+                if (!matriculaListOld.contains(matriculaListNewMatricula)) {
+                    Grado oldGradoOfMatriculaListNewMatricula = matriculaListNewMatricula.getGrado();
+                    matriculaListNewMatricula.setGrado(grado);
+                    matriculaListNewMatricula = em.merge(matriculaListNewMatricula);
+                    if (oldGradoOfMatriculaListNewMatricula != null && !oldGradoOfMatriculaListNewMatricula.equals(grado)) {
+                        oldGradoOfMatriculaListNewMatricula.getMatriculaList().remove(matriculaListNewMatricula);
+                        oldGradoOfMatriculaListNewMatricula = em.merge(oldGradoOfMatriculaListNewMatricula);
+                    }
+                }
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                GradoPK id = grado.getGradoPK();
+                Integer id = grado.getCodigo();
                 if (findGrado(id) == null) {
                     throw new NonexistentEntityException("The grado with id " + id + " no longer exists.");
                 }
@@ -131,7 +212,7 @@ public class GradoJpaController implements Serializable {
         }
     }
 
-    public void destroy(GradoPK id) throws NonexistentEntityException {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -139,19 +220,37 @@ public class GradoJpaController implements Serializable {
             Grado grado;
             try {
                 grado = em.getReference(Grado.class, id);
-                grado.getGradoPK();
+                grado.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The grado with id " + id + " no longer exists.", enfe);
             }
-            Curso curso = grado.getCurso();
-            if (curso != null) {
-                curso.getGradoList().remove(grado);
-                curso = em.merge(curso);
+            List<String> illegalOrphanMessages = null;
+            Guia guiaOrphanCheck = grado.getGuia();
+            if (guiaOrphanCheck != null) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Grado (" + grado + ") cannot be destroyed since the Guia " + guiaOrphanCheck + " in its guia field has a non-nullable grado1 field.");
             }
-            Seccion seccion = grado.getSeccion();
-            if (seccion != null) {
-                seccion.getGradoList().remove(grado);
-                seccion = em.merge(seccion);
+            List<Matricula> matriculaListOrphanCheck = grado.getMatriculaList();
+            for (Matricula matriculaListOrphanCheckMatricula : matriculaListOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Grado (" + grado + ") cannot be destroyed since the Matricula " + matriculaListOrphanCheckMatricula + " in its matriculaList field has a non-nullable grado field.");
+            }
+            if (illegalOrphanMessages != null) {
+                throw new IllegalOrphanException(illegalOrphanMessages);
+            }
+            Curso codCurso = grado.getCodCurso();
+            if (codCurso != null) {
+                codCurso.getGradoList().remove(grado);
+                codCurso = em.merge(codCurso);
+            }
+            Seccion codSeccion = grado.getCodSeccion();
+            if (codSeccion != null) {
+                codSeccion.getGradoList().remove(grado);
+                codSeccion = em.merge(codSeccion);
             }
             em.remove(grado);
             em.getTransaction().commit();
@@ -186,7 +285,7 @@ public class GradoJpaController implements Serializable {
         }
     }
 
-    public Grado findGrado(GradoPK id) {
+    public Grado findGrado(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Grado.class, id);

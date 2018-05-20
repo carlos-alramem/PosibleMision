@@ -8,8 +8,8 @@ package Entities;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "prof_por_materia", catalog = "notas", schema = "public")
@@ -27,87 +27,85 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "ProfPorMateria.findAll", query = "SELECT p FROM ProfPorMateria p")
     , @NamedQuery(name = "ProfPorMateria.findByCodigo", query = "SELECT p FROM ProfPorMateria p WHERE p.codigo = :codigo")
-    , @NamedQuery(name = "ProfPorMateria.findByDuiProfesor", query = "SELECT p FROM ProfPorMateria p WHERE p.profPorMateriaPK.duiProfesor = :duiProfesor")
-    , @NamedQuery(name = "ProfPorMateria.findByCodMatPorCurso", query = "SELECT p FROM ProfPorMateria p WHERE p.profPorMateriaPK.codMatPorCurso = :codMatPorCurso")
-    , @NamedQuery(name = "ProfPorMateria.findByAnioInicio", query = "SELECT p FROM ProfPorMateria p WHERE p.profPorMateriaPK.anioInicio = :anioInicio")
+    , @NamedQuery(name = "ProfPorMateria.findByAnioInicio", query = "SELECT p FROM ProfPorMateria p WHERE p.anioInicio = :anioInicio")
     , @NamedQuery(name = "ProfPorMateria.findByAnioFin", query = "SELECT p FROM ProfPorMateria p WHERE p.anioFin = :anioFin")})
 public class ProfPorMateria implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected ProfPorMateriaPK profPorMateriaPK;
+    @Id
     @Basic(optional = false)
     @Column(name = "codigo")
-    private int codigo;
+    private Integer codigo;
+    @Basic(optional = false)
+    @Column(name = "anio_inicio")
+    private int anioInicio;
+    @Basic(optional = false)
     @Column(name = "anio_fin")
-    private Integer anioFin;
-    @JoinColumn(name = "cod_mat_por_curso", referencedColumnName = "codigo", insertable = false, updatable = false)
+    private int anioFin;
+    @JoinColumn(name = "cod_mat_por_curso", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private MatPorCurso matPorCurso;
-    @JoinColumn(name = "dui_profesor", referencedColumnName = "dui", insertable = false, updatable = false)
+    private MatPorCurso codMatPorCurso;
+    @JoinColumn(name = "dui_profesor", referencedColumnName = "dui")
     @ManyToOne(optional = false)
-    private Profesor profesor;
+    private Profesor duiProfesor;
 
     public ProfPorMateria() {
     }
 
-    public ProfPorMateria(ProfPorMateriaPK profPorMateriaPK) {
-        this.profPorMateriaPK = profPorMateriaPK;
-    }
-
-    public ProfPorMateria(ProfPorMateriaPK profPorMateriaPK, int codigo) {
-        this.profPorMateriaPK = profPorMateriaPK;
+    public ProfPorMateria(Integer codigo) {
         this.codigo = codigo;
     }
 
-    public ProfPorMateria(String duiProfesor, int codMatPorCurso, int anioInicio) {
-        this.profPorMateriaPK = new ProfPorMateriaPK(duiProfesor, codMatPorCurso, anioInicio);
-    }
-
-    public ProfPorMateriaPK getProfPorMateriaPK() {
-        return profPorMateriaPK;
-    }
-
-    public void setProfPorMateriaPK(ProfPorMateriaPK profPorMateriaPK) {
-        this.profPorMateriaPK = profPorMateriaPK;
-    }
-
-    public int getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(int codigo) {
+    public ProfPorMateria(Integer codigo, int anioInicio, int anioFin) {
         this.codigo = codigo;
-    }
-
-    public Integer getAnioFin() {
-        return anioFin;
-    }
-
-    public void setAnioFin(Integer anioFin) {
+        this.anioInicio = anioInicio;
         this.anioFin = anioFin;
     }
 
-    public MatPorCurso getMatPorCurso() {
-        return matPorCurso;
+    public Integer getCodigo() {
+        return codigo;
     }
 
-    public void setMatPorCurso(MatPorCurso matPorCurso) {
-        this.matPorCurso = matPorCurso;
+    public void setCodigo(Integer codigo) {
+        this.codigo = codigo;
     }
 
-    public Profesor getProfesor() {
-        return profesor;
+    public int getAnioInicio() {
+        return anioInicio;
     }
 
-    public void setProfesor(Profesor profesor) {
-        this.profesor = profesor;
+    public void setAnioInicio(int anioInicio) {
+        this.anioInicio = anioInicio;
+    }
+
+    public int getAnioFin() {
+        return anioFin;
+    }
+
+    public void setAnioFin(int anioFin) {
+        this.anioFin = anioFin;
+    }
+
+    public MatPorCurso getCodMatPorCurso() {
+        return codMatPorCurso;
+    }
+
+    public void setCodMatPorCurso(MatPorCurso codMatPorCurso) {
+        this.codMatPorCurso = codMatPorCurso;
+    }
+
+    public Profesor getDuiProfesor() {
+        return duiProfesor;
+    }
+
+    public void setDuiProfesor(Profesor duiProfesor) {
+        this.duiProfesor = duiProfesor;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (profPorMateriaPK != null ? profPorMateriaPK.hashCode() : 0);
+        hash += (codigo != null ? codigo.hashCode() : 0);
         return hash;
     }
 
@@ -118,7 +116,7 @@ public class ProfPorMateria implements Serializable {
             return false;
         }
         ProfPorMateria other = (ProfPorMateria) object;
-        if ((this.profPorMateriaPK == null && other.profPorMateriaPK != null) || (this.profPorMateriaPK != null && !this.profPorMateriaPK.equals(other.profPorMateriaPK))) {
+        if ((this.codigo == null && other.codigo != null) || (this.codigo != null && !this.codigo.equals(other.codigo))) {
             return false;
         }
         return true;
@@ -126,7 +124,7 @@ public class ProfPorMateria implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.ProfPorMateria[ profPorMateriaPK=" + profPorMateriaPK + " ]";
+        return "Entities.ProfPorMateria[ codigo=" + codigo + " ]";
     }
     
 }

@@ -12,7 +12,7 @@ import javax.persistence.Embeddable;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Embeddable
 public class MatriculaPK implements Serializable {
@@ -21,8 +21,8 @@ public class MatriculaPK implements Serializable {
     @Column(name = "cod_alumno")
     private String codAlumno;
     @Basic(optional = false)
-    @Column(name = "cod_prof_por_curso")
-    private int codProfPorCurso;
+    @Column(name = "cod_grado")
+    private int codGrado;
     @Basic(optional = false)
     @Column(name = "anio")
     private int anio;
@@ -30,9 +30,9 @@ public class MatriculaPK implements Serializable {
     public MatriculaPK() {
     }
 
-    public MatriculaPK(String codAlumno, int codProfPorCurso, int anio) {
+    public MatriculaPK(String codAlumno, int codGrado, int anio) {
         this.codAlumno = codAlumno;
-        this.codProfPorCurso = codProfPorCurso;
+        this.codGrado = codGrado;
         this.anio = anio;
     }
 
@@ -44,12 +44,12 @@ public class MatriculaPK implements Serializable {
         this.codAlumno = codAlumno;
     }
 
-    public int getCodProfPorCurso() {
-        return codProfPorCurso;
+    public int getCodGrado() {
+        return codGrado;
     }
 
-    public void setCodProfPorCurso(int codProfPorCurso) {
-        this.codProfPorCurso = codProfPorCurso;
+    public void setCodGrado(int codGrado) {
+        this.codGrado = codGrado;
     }
 
     public int getAnio() {
@@ -64,7 +64,7 @@ public class MatriculaPK implements Serializable {
     public int hashCode() {
         int hash = 0;
         hash += (codAlumno != null ? codAlumno.hashCode() : 0);
-        hash += (int) codProfPorCurso;
+        hash += (int) codGrado;
         hash += (int) anio;
         return hash;
     }
@@ -79,7 +79,7 @@ public class MatriculaPK implements Serializable {
         if ((this.codAlumno == null && other.codAlumno != null) || (this.codAlumno != null && !this.codAlumno.equals(other.codAlumno))) {
             return false;
         }
-        if (this.codProfPorCurso != other.codProfPorCurso) {
+        if (this.codGrado != other.codGrado) {
             return false;
         }
         if (this.anio != other.anio) {
@@ -90,7 +90,7 @@ public class MatriculaPK implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.MatriculaPK[ codAlumno=" + codAlumno + ", codProfPorCurso=" + codProfPorCurso + ", anio=" + anio + " ]";
+        return "Entities.MatriculaPK[ codAlumno=" + codAlumno + ", codGrado=" + codGrado + ", anio=" + anio + " ]";
     }
     
 }

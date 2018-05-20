@@ -17,7 +17,6 @@ import Entities.Curso;
 import Entities.Materia;
 import Entities.Actividad;
 import Entities.MatPorCurso;
-import Entities.MatPorCursoPK;
 import java.util.ArrayList;
 import java.util.List;
 import Entities.ProfPorMateria;
@@ -26,7 +25,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class MatPorCursoJpaController implements Serializable {
 
@@ -40,51 +39,46 @@ public class MatPorCursoJpaController implements Serializable {
     }
 
     public void create(MatPorCurso matPorCurso) throws PreexistingEntityException, Exception {
-        if (matPorCurso.getMatPorCursoPK() == null) {
-            matPorCurso.setMatPorCursoPK(new MatPorCursoPK());
-        }
         if (matPorCurso.getActividadList() == null) {
             matPorCurso.setActividadList(new ArrayList<Actividad>());
         }
         if (matPorCurso.getProfPorMateriaList() == null) {
             matPorCurso.setProfPorMateriaList(new ArrayList<ProfPorMateria>());
         }
-        matPorCurso.getMatPorCursoPK().setCodCurso(matPorCurso.getCurso().getCursoPK().getCodigo());
-        matPorCurso.getMatPorCursoPK().setCodMateria(matPorCurso.getMateria().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Curso curso = matPorCurso.getCurso();
-            if (curso != null) {
-                curso = em.getReference(curso.getClass(), curso.getCursoPK());
-                matPorCurso.setCurso(curso);
+            Curso codCurso = matPorCurso.getCodCurso();
+            if (codCurso != null) {
+                codCurso = em.getReference(codCurso.getClass(), codCurso.getCodigo());
+                matPorCurso.setCodCurso(codCurso);
             }
-            Materia materia = matPorCurso.getMateria();
-            if (materia != null) {
-                materia = em.getReference(materia.getClass(), materia.getCodigo());
-                matPorCurso.setMateria(materia);
+            Materia codMateria = matPorCurso.getCodMateria();
+            if (codMateria != null) {
+                codMateria = em.getReference(codMateria.getClass(), codMateria.getCodigo());
+                matPorCurso.setCodMateria(codMateria);
             }
             List<Actividad> attachedActividadList = new ArrayList<Actividad>();
             for (Actividad actividadListActividadToAttach : matPorCurso.getActividadList()) {
-                actividadListActividadToAttach = em.getReference(actividadListActividadToAttach.getClass(), actividadListActividadToAttach.getActividadPK());
+                actividadListActividadToAttach = em.getReference(actividadListActividadToAttach.getClass(), actividadListActividadToAttach.getCodigo());
                 attachedActividadList.add(actividadListActividadToAttach);
             }
             matPorCurso.setActividadList(attachedActividadList);
             List<ProfPorMateria> attachedProfPorMateriaList = new ArrayList<ProfPorMateria>();
             for (ProfPorMateria profPorMateriaListProfPorMateriaToAttach : matPorCurso.getProfPorMateriaList()) {
-                profPorMateriaListProfPorMateriaToAttach = em.getReference(profPorMateriaListProfPorMateriaToAttach.getClass(), profPorMateriaListProfPorMateriaToAttach.getProfPorMateriaPK());
+                profPorMateriaListProfPorMateriaToAttach = em.getReference(profPorMateriaListProfPorMateriaToAttach.getClass(), profPorMateriaListProfPorMateriaToAttach.getCodigo());
                 attachedProfPorMateriaList.add(profPorMateriaListProfPorMateriaToAttach);
             }
             matPorCurso.setProfPorMateriaList(attachedProfPorMateriaList);
             em.persist(matPorCurso);
-            if (curso != null) {
-                curso.getMatPorCursoList().add(matPorCurso);
-                curso = em.merge(curso);
+            if (codCurso != null) {
+                codCurso.getMatPorCursoList().add(matPorCurso);
+                codCurso = em.merge(codCurso);
             }
-            if (materia != null) {
-                materia.getMatPorCursoList().add(matPorCurso);
-                materia = em.merge(materia);
+            if (codMateria != null) {
+                codMateria.getMatPorCursoList().add(matPorCurso);
+                codMateria = em.merge(codMateria);
             }
             for (Actividad actividadListActividad : matPorCurso.getActividadList()) {
                 MatPorCurso oldCodMatCursoOfActividadListActividad = actividadListActividad.getCodMatCurso();
@@ -96,17 +90,17 @@ public class MatPorCursoJpaController implements Serializable {
                 }
             }
             for (ProfPorMateria profPorMateriaListProfPorMateria : matPorCurso.getProfPorMateriaList()) {
-                MatPorCurso oldMatPorCursoOfProfPorMateriaListProfPorMateria = profPorMateriaListProfPorMateria.getMatPorCurso();
-                profPorMateriaListProfPorMateria.setMatPorCurso(matPorCurso);
+                MatPorCurso oldCodMatPorCursoOfProfPorMateriaListProfPorMateria = profPorMateriaListProfPorMateria.getCodMatPorCurso();
+                profPorMateriaListProfPorMateria.setCodMatPorCurso(matPorCurso);
                 profPorMateriaListProfPorMateria = em.merge(profPorMateriaListProfPorMateria);
-                if (oldMatPorCursoOfProfPorMateriaListProfPorMateria != null) {
-                    oldMatPorCursoOfProfPorMateriaListProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListProfPorMateria);
-                    oldMatPorCursoOfProfPorMateriaListProfPorMateria = em.merge(oldMatPorCursoOfProfPorMateriaListProfPorMateria);
+                if (oldCodMatPorCursoOfProfPorMateriaListProfPorMateria != null) {
+                    oldCodMatPorCursoOfProfPorMateriaListProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListProfPorMateria);
+                    oldCodMatPorCursoOfProfPorMateriaListProfPorMateria = em.merge(oldCodMatPorCursoOfProfPorMateriaListProfPorMateria);
                 }
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findMatPorCurso(matPorCurso.getMatPorCursoPK()) != null) {
+            if (findMatPorCurso(matPorCurso.getCodigo()) != null) {
                 throw new PreexistingEntityException("MatPorCurso " + matPorCurso + " already exists.", ex);
             }
             throw ex;
@@ -118,17 +112,15 @@ public class MatPorCursoJpaController implements Serializable {
     }
 
     public void edit(MatPorCurso matPorCurso) throws IllegalOrphanException, NonexistentEntityException, Exception {
-        matPorCurso.getMatPorCursoPK().setCodCurso(matPorCurso.getCurso().getCursoPK().getCodigo());
-        matPorCurso.getMatPorCursoPK().setCodMateria(matPorCurso.getMateria().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            MatPorCurso persistentMatPorCurso = em.find(MatPorCurso.class, matPorCurso.getMatPorCursoPK());
-            Curso cursoOld = persistentMatPorCurso.getCurso();
-            Curso cursoNew = matPorCurso.getCurso();
-            Materia materiaOld = persistentMatPorCurso.getMateria();
-            Materia materiaNew = matPorCurso.getMateria();
+            MatPorCurso persistentMatPorCurso = em.find(MatPorCurso.class, matPorCurso.getCodigo());
+            Curso codCursoOld = persistentMatPorCurso.getCodCurso();
+            Curso codCursoNew = matPorCurso.getCodCurso();
+            Materia codMateriaOld = persistentMatPorCurso.getCodMateria();
+            Materia codMateriaNew = matPorCurso.getCodMateria();
             List<Actividad> actividadListOld = persistentMatPorCurso.getActividadList();
             List<Actividad> actividadListNew = matPorCurso.getActividadList();
             List<ProfPorMateria> profPorMateriaListOld = persistentMatPorCurso.getProfPorMateriaList();
@@ -147,50 +139,50 @@ public class MatPorCursoJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain ProfPorMateria " + profPorMateriaListOldProfPorMateria + " since its matPorCurso field is not nullable.");
+                    illegalOrphanMessages.add("You must retain ProfPorMateria " + profPorMateriaListOldProfPorMateria + " since its codMatPorCurso field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
-            if (cursoNew != null) {
-                cursoNew = em.getReference(cursoNew.getClass(), cursoNew.getCursoPK());
-                matPorCurso.setCurso(cursoNew);
+            if (codCursoNew != null) {
+                codCursoNew = em.getReference(codCursoNew.getClass(), codCursoNew.getCodigo());
+                matPorCurso.setCodCurso(codCursoNew);
             }
-            if (materiaNew != null) {
-                materiaNew = em.getReference(materiaNew.getClass(), materiaNew.getCodigo());
-                matPorCurso.setMateria(materiaNew);
+            if (codMateriaNew != null) {
+                codMateriaNew = em.getReference(codMateriaNew.getClass(), codMateriaNew.getCodigo());
+                matPorCurso.setCodMateria(codMateriaNew);
             }
             List<Actividad> attachedActividadListNew = new ArrayList<Actividad>();
             for (Actividad actividadListNewActividadToAttach : actividadListNew) {
-                actividadListNewActividadToAttach = em.getReference(actividadListNewActividadToAttach.getClass(), actividadListNewActividadToAttach.getActividadPK());
+                actividadListNewActividadToAttach = em.getReference(actividadListNewActividadToAttach.getClass(), actividadListNewActividadToAttach.getCodigo());
                 attachedActividadListNew.add(actividadListNewActividadToAttach);
             }
             actividadListNew = attachedActividadListNew;
             matPorCurso.setActividadList(actividadListNew);
             List<ProfPorMateria> attachedProfPorMateriaListNew = new ArrayList<ProfPorMateria>();
             for (ProfPorMateria profPorMateriaListNewProfPorMateriaToAttach : profPorMateriaListNew) {
-                profPorMateriaListNewProfPorMateriaToAttach = em.getReference(profPorMateriaListNewProfPorMateriaToAttach.getClass(), profPorMateriaListNewProfPorMateriaToAttach.getProfPorMateriaPK());
+                profPorMateriaListNewProfPorMateriaToAttach = em.getReference(profPorMateriaListNewProfPorMateriaToAttach.getClass(), profPorMateriaListNewProfPorMateriaToAttach.getCodigo());
                 attachedProfPorMateriaListNew.add(profPorMateriaListNewProfPorMateriaToAttach);
             }
             profPorMateriaListNew = attachedProfPorMateriaListNew;
             matPorCurso.setProfPorMateriaList(profPorMateriaListNew);
             matPorCurso = em.merge(matPorCurso);
-            if (cursoOld != null && !cursoOld.equals(cursoNew)) {
-                cursoOld.getMatPorCursoList().remove(matPorCurso);
-                cursoOld = em.merge(cursoOld);
+            if (codCursoOld != null && !codCursoOld.equals(codCursoNew)) {
+                codCursoOld.getMatPorCursoList().remove(matPorCurso);
+                codCursoOld = em.merge(codCursoOld);
             }
-            if (cursoNew != null && !cursoNew.equals(cursoOld)) {
-                cursoNew.getMatPorCursoList().add(matPorCurso);
-                cursoNew = em.merge(cursoNew);
+            if (codCursoNew != null && !codCursoNew.equals(codCursoOld)) {
+                codCursoNew.getMatPorCursoList().add(matPorCurso);
+                codCursoNew = em.merge(codCursoNew);
             }
-            if (materiaOld != null && !materiaOld.equals(materiaNew)) {
-                materiaOld.getMatPorCursoList().remove(matPorCurso);
-                materiaOld = em.merge(materiaOld);
+            if (codMateriaOld != null && !codMateriaOld.equals(codMateriaNew)) {
+                codMateriaOld.getMatPorCursoList().remove(matPorCurso);
+                codMateriaOld = em.merge(codMateriaOld);
             }
-            if (materiaNew != null && !materiaNew.equals(materiaOld)) {
-                materiaNew.getMatPorCursoList().add(matPorCurso);
-                materiaNew = em.merge(materiaNew);
+            if (codMateriaNew != null && !codMateriaNew.equals(codMateriaOld)) {
+                codMateriaNew.getMatPorCursoList().add(matPorCurso);
+                codMateriaNew = em.merge(codMateriaNew);
             }
             for (Actividad actividadListNewActividad : actividadListNew) {
                 if (!actividadListOld.contains(actividadListNewActividad)) {
@@ -205,12 +197,12 @@ public class MatPorCursoJpaController implements Serializable {
             }
             for (ProfPorMateria profPorMateriaListNewProfPorMateria : profPorMateriaListNew) {
                 if (!profPorMateriaListOld.contains(profPorMateriaListNewProfPorMateria)) {
-                    MatPorCurso oldMatPorCursoOfProfPorMateriaListNewProfPorMateria = profPorMateriaListNewProfPorMateria.getMatPorCurso();
-                    profPorMateriaListNewProfPorMateria.setMatPorCurso(matPorCurso);
+                    MatPorCurso oldCodMatPorCursoOfProfPorMateriaListNewProfPorMateria = profPorMateriaListNewProfPorMateria.getCodMatPorCurso();
+                    profPorMateriaListNewProfPorMateria.setCodMatPorCurso(matPorCurso);
                     profPorMateriaListNewProfPorMateria = em.merge(profPorMateriaListNewProfPorMateria);
-                    if (oldMatPorCursoOfProfPorMateriaListNewProfPorMateria != null && !oldMatPorCursoOfProfPorMateriaListNewProfPorMateria.equals(matPorCurso)) {
-                        oldMatPorCursoOfProfPorMateriaListNewProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListNewProfPorMateria);
-                        oldMatPorCursoOfProfPorMateriaListNewProfPorMateria = em.merge(oldMatPorCursoOfProfPorMateriaListNewProfPorMateria);
+                    if (oldCodMatPorCursoOfProfPorMateriaListNewProfPorMateria != null && !oldCodMatPorCursoOfProfPorMateriaListNewProfPorMateria.equals(matPorCurso)) {
+                        oldCodMatPorCursoOfProfPorMateriaListNewProfPorMateria.getProfPorMateriaList().remove(profPorMateriaListNewProfPorMateria);
+                        oldCodMatPorCursoOfProfPorMateriaListNewProfPorMateria = em.merge(oldCodMatPorCursoOfProfPorMateriaListNewProfPorMateria);
                     }
                 }
             }
@@ -218,7 +210,7 @@ public class MatPorCursoJpaController implements Serializable {
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                MatPorCursoPK id = matPorCurso.getMatPorCursoPK();
+                Integer id = matPorCurso.getCodigo();
                 if (findMatPorCurso(id) == null) {
                     throw new NonexistentEntityException("The matPorCurso with id " + id + " no longer exists.");
                 }
@@ -231,7 +223,7 @@ public class MatPorCursoJpaController implements Serializable {
         }
     }
 
-    public void destroy(MatPorCursoPK id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -239,7 +231,7 @@ public class MatPorCursoJpaController implements Serializable {
             MatPorCurso matPorCurso;
             try {
                 matPorCurso = em.getReference(MatPorCurso.class, id);
-                matPorCurso.getMatPorCursoPK();
+                matPorCurso.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The matPorCurso with id " + id + " no longer exists.", enfe);
             }
@@ -256,20 +248,20 @@ public class MatPorCursoJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This MatPorCurso (" + matPorCurso + ") cannot be destroyed since the ProfPorMateria " + profPorMateriaListOrphanCheckProfPorMateria + " in its profPorMateriaList field has a non-nullable matPorCurso field.");
+                illegalOrphanMessages.add("This MatPorCurso (" + matPorCurso + ") cannot be destroyed since the ProfPorMateria " + profPorMateriaListOrphanCheckProfPorMateria + " in its profPorMateriaList field has a non-nullable codMatPorCurso field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
-            Curso curso = matPorCurso.getCurso();
-            if (curso != null) {
-                curso.getMatPorCursoList().remove(matPorCurso);
-                curso = em.merge(curso);
+            Curso codCurso = matPorCurso.getCodCurso();
+            if (codCurso != null) {
+                codCurso.getMatPorCursoList().remove(matPorCurso);
+                codCurso = em.merge(codCurso);
             }
-            Materia materia = matPorCurso.getMateria();
-            if (materia != null) {
-                materia.getMatPorCursoList().remove(matPorCurso);
-                materia = em.merge(materia);
+            Materia codMateria = matPorCurso.getCodMateria();
+            if (codMateria != null) {
+                codMateria.getMatPorCursoList().remove(matPorCurso);
+                codMateria = em.merge(codMateria);
             }
             em.remove(matPorCurso);
             em.getTransaction().commit();
@@ -304,7 +296,7 @@ public class MatPorCursoJpaController implements Serializable {
         }
     }
 
-    public MatPorCurso findMatPorCurso(MatPorCursoPK id) {
+    public MatPorCurso findMatPorCurso(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(MatPorCurso.class, id);

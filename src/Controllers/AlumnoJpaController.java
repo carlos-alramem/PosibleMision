@@ -9,7 +9,6 @@ import Controllers.exceptions.IllegalOrphanException;
 import Controllers.exceptions.NonexistentEntityException;
 import Controllers.exceptions.PreexistingEntityException;
 import Entities.Alumno;
-import Entities.AlumnoPK;
 import java.io.Serializable;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
@@ -19,12 +18,13 @@ import Entities.Matricula;
 import java.util.ArrayList;
 import java.util.List;
 import Entities.Nota;
+import Entities.ObsPorAlumno;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class AlumnoJpaController implements Serializable {
 
@@ -38,14 +38,14 @@ public class AlumnoJpaController implements Serializable {
     }
 
     public void create(Alumno alumno) throws PreexistingEntityException, Exception {
-        if (alumno.getAlumnoPK() == null) {
-            alumno.setAlumnoPK(new AlumnoPK());
-        }
         if (alumno.getMatriculaList() == null) {
             alumno.setMatriculaList(new ArrayList<Matricula>());
         }
         if (alumno.getNotaList() == null) {
             alumno.setNotaList(new ArrayList<Nota>());
+        }
+        if (alumno.getObsPorAlumnoList() == null) {
+            alumno.setObsPorAlumnoList(new ArrayList<ObsPorAlumno>());
         }
         EntityManager em = null;
         try {
@@ -63,6 +63,12 @@ public class AlumnoJpaController implements Serializable {
                 attachedNotaList.add(notaListNotaToAttach);
             }
             alumno.setNotaList(attachedNotaList);
+            List<ObsPorAlumno> attachedObsPorAlumnoList = new ArrayList<ObsPorAlumno>();
+            for (ObsPorAlumno obsPorAlumnoListObsPorAlumnoToAttach : alumno.getObsPorAlumnoList()) {
+                obsPorAlumnoListObsPorAlumnoToAttach = em.getReference(obsPorAlumnoListObsPorAlumnoToAttach.getClass(), obsPorAlumnoListObsPorAlumnoToAttach.getObsPorAlumnoPK());
+                attachedObsPorAlumnoList.add(obsPorAlumnoListObsPorAlumnoToAttach);
+            }
+            alumno.setObsPorAlumnoList(attachedObsPorAlumnoList);
             em.persist(alumno);
             for (Matricula matriculaListMatricula : alumno.getMatriculaList()) {
                 Alumno oldAlumnoOfMatriculaListMatricula = matriculaListMatricula.getAlumno();
@@ -82,9 +88,18 @@ public class AlumnoJpaController implements Serializable {
                     oldAlumnoOfNotaListNota = em.merge(oldAlumnoOfNotaListNota);
                 }
             }
+            for (ObsPorAlumno obsPorAlumnoListObsPorAlumno : alumno.getObsPorAlumnoList()) {
+                Alumno oldAlumnoOfObsPorAlumnoListObsPorAlumno = obsPorAlumnoListObsPorAlumno.getAlumno();
+                obsPorAlumnoListObsPorAlumno.setAlumno(alumno);
+                obsPorAlumnoListObsPorAlumno = em.merge(obsPorAlumnoListObsPorAlumno);
+                if (oldAlumnoOfObsPorAlumnoListObsPorAlumno != null) {
+                    oldAlumnoOfObsPorAlumnoListObsPorAlumno.getObsPorAlumnoList().remove(obsPorAlumnoListObsPorAlumno);
+                    oldAlumnoOfObsPorAlumnoListObsPorAlumno = em.merge(oldAlumnoOfObsPorAlumnoListObsPorAlumno);
+                }
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findAlumno(alumno.getAlumnoPK()) != null) {
+            if (findAlumno(alumno.getCodigo()) != null) {
                 throw new PreexistingEntityException("Alumno " + alumno + " already exists.", ex);
             }
             throw ex;
@@ -100,11 +115,13 @@ public class AlumnoJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Alumno persistentAlumno = em.find(Alumno.class, alumno.getAlumnoPK());
+            Alumno persistentAlumno = em.find(Alumno.class, alumno.getCodigo());
             List<Matricula> matriculaListOld = persistentAlumno.getMatriculaList();
             List<Matricula> matriculaListNew = alumno.getMatriculaList();
             List<Nota> notaListOld = persistentAlumno.getNotaList();
             List<Nota> notaListNew = alumno.getNotaList();
+            List<ObsPorAlumno> obsPorAlumnoListOld = persistentAlumno.getObsPorAlumnoList();
+            List<ObsPorAlumno> obsPorAlumnoListNew = alumno.getObsPorAlumnoList();
             List<String> illegalOrphanMessages = null;
             for (Matricula matriculaListOldMatricula : matriculaListOld) {
                 if (!matriculaListNew.contains(matriculaListOldMatricula)) {
@@ -120,6 +137,14 @@ public class AlumnoJpaController implements Serializable {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
                     illegalOrphanMessages.add("You must retain Nota " + notaListOldNota + " since its alumno field is not nullable.");
+                }
+            }
+            for (ObsPorAlumno obsPorAlumnoListOldObsPorAlumno : obsPorAlumnoListOld) {
+                if (!obsPorAlumnoListNew.contains(obsPorAlumnoListOldObsPorAlumno)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain ObsPorAlumno " + obsPorAlumnoListOldObsPorAlumno + " since its alumno field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -139,6 +164,13 @@ public class AlumnoJpaController implements Serializable {
             }
             notaListNew = attachedNotaListNew;
             alumno.setNotaList(notaListNew);
+            List<ObsPorAlumno> attachedObsPorAlumnoListNew = new ArrayList<ObsPorAlumno>();
+            for (ObsPorAlumno obsPorAlumnoListNewObsPorAlumnoToAttach : obsPorAlumnoListNew) {
+                obsPorAlumnoListNewObsPorAlumnoToAttach = em.getReference(obsPorAlumnoListNewObsPorAlumnoToAttach.getClass(), obsPorAlumnoListNewObsPorAlumnoToAttach.getObsPorAlumnoPK());
+                attachedObsPorAlumnoListNew.add(obsPorAlumnoListNewObsPorAlumnoToAttach);
+            }
+            obsPorAlumnoListNew = attachedObsPorAlumnoListNew;
+            alumno.setObsPorAlumnoList(obsPorAlumnoListNew);
             alumno = em.merge(alumno);
             for (Matricula matriculaListNewMatricula : matriculaListNew) {
                 if (!matriculaListOld.contains(matriculaListNewMatricula)) {
@@ -162,11 +194,22 @@ public class AlumnoJpaController implements Serializable {
                     }
                 }
             }
+            for (ObsPorAlumno obsPorAlumnoListNewObsPorAlumno : obsPorAlumnoListNew) {
+                if (!obsPorAlumnoListOld.contains(obsPorAlumnoListNewObsPorAlumno)) {
+                    Alumno oldAlumnoOfObsPorAlumnoListNewObsPorAlumno = obsPorAlumnoListNewObsPorAlumno.getAlumno();
+                    obsPorAlumnoListNewObsPorAlumno.setAlumno(alumno);
+                    obsPorAlumnoListNewObsPorAlumno = em.merge(obsPorAlumnoListNewObsPorAlumno);
+                    if (oldAlumnoOfObsPorAlumnoListNewObsPorAlumno != null && !oldAlumnoOfObsPorAlumnoListNewObsPorAlumno.equals(alumno)) {
+                        oldAlumnoOfObsPorAlumnoListNewObsPorAlumno.getObsPorAlumnoList().remove(obsPorAlumnoListNewObsPorAlumno);
+                        oldAlumnoOfObsPorAlumnoListNewObsPorAlumno = em.merge(oldAlumnoOfObsPorAlumnoListNewObsPorAlumno);
+                    }
+                }
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                AlumnoPK id = alumno.getAlumnoPK();
+                String id = alumno.getCodigo();
                 if (findAlumno(id) == null) {
                     throw new NonexistentEntityException("The alumno with id " + id + " no longer exists.");
                 }
@@ -179,7 +222,7 @@ public class AlumnoJpaController implements Serializable {
         }
     }
 
-    public void destroy(AlumnoPK id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(String id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -187,7 +230,7 @@ public class AlumnoJpaController implements Serializable {
             Alumno alumno;
             try {
                 alumno = em.getReference(Alumno.class, id);
-                alumno.getAlumnoPK();
+                alumno.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The alumno with id " + id + " no longer exists.", enfe);
             }
@@ -205,6 +248,13 @@ public class AlumnoJpaController implements Serializable {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
                 illegalOrphanMessages.add("This Alumno (" + alumno + ") cannot be destroyed since the Nota " + notaListOrphanCheckNota + " in its notaList field has a non-nullable alumno field.");
+            }
+            List<ObsPorAlumno> obsPorAlumnoListOrphanCheck = alumno.getObsPorAlumnoList();
+            for (ObsPorAlumno obsPorAlumnoListOrphanCheckObsPorAlumno : obsPorAlumnoListOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Alumno (" + alumno + ") cannot be destroyed since the ObsPorAlumno " + obsPorAlumnoListOrphanCheckObsPorAlumno + " in its obsPorAlumnoList field has a non-nullable alumno field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
@@ -242,7 +292,7 @@ public class AlumnoJpaController implements Serializable {
         }
     }
 
-    public Alumno findAlumno(AlumnoPK id) {
+    public Alumno findAlumno(String id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Alumno.class, id);

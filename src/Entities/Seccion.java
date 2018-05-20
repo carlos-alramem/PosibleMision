@@ -10,8 +10,8 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -21,49 +21,51 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "seccion", catalog = "notas", schema = "public")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Seccion.findAll", query = "SELECT s FROM Seccion s")
-    , @NamedQuery(name = "Seccion.findByCodigo", query = "SELECT s FROM Seccion s WHERE s.seccionPK.codigo = :codigo")
+    , @NamedQuery(name = "Seccion.findByCodigo", query = "SELECT s FROM Seccion s WHERE s.codigo = :codigo")
     , @NamedQuery(name = "Seccion.findByNombre", query = "SELECT s FROM Seccion s WHERE s.nombre = :nombre")
-    , @NamedQuery(name = "Seccion.findByTurno", query = "SELECT s FROM Seccion s WHERE s.seccionPK.turno = :turno")})
+    , @NamedQuery(name = "Seccion.findByTurno", query = "SELECT s FROM Seccion s WHERE s.turno = :turno")})
 public class Seccion implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected SeccionPK seccionPK;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "codigo")
+    private Integer codigo;
     @Basic(optional = false)
     @Column(name = "nombre")
     private String nombre;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "seccion")
+    @Basic(optional = false)
+    @Column(name = "turno")
+    private Character turno;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "codSeccion")
     private List<Grado> gradoList;
 
     public Seccion() {
     }
 
-    public Seccion(SeccionPK seccionPK) {
-        this.seccionPK = seccionPK;
+    public Seccion(Integer codigo) {
+        this.codigo = codigo;
     }
 
-    public Seccion(SeccionPK seccionPK, String nombre) {
-        this.seccionPK = seccionPK;
+    public Seccion(Integer codigo, String nombre, Character turno) {
+        this.codigo = codigo;
         this.nombre = nombre;
+        this.turno = turno;
     }
 
-    public Seccion(int codigo, Character turno) {
-        this.seccionPK = new SeccionPK(codigo, turno);
+    public Integer getCodigo() {
+        return codigo;
     }
 
-    public SeccionPK getSeccionPK() {
-        return seccionPK;
-    }
-
-    public void setSeccionPK(SeccionPK seccionPK) {
-        this.seccionPK = seccionPK;
+    public void setCodigo(Integer codigo) {
+        this.codigo = codigo;
     }
 
     public String getNombre() {
@@ -72,6 +74,14 @@ public class Seccion implements Serializable {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public Character getTurno() {
+        return turno;
+    }
+
+    public void setTurno(Character turno) {
+        this.turno = turno;
     }
 
     @XmlTransient
@@ -86,7 +96,7 @@ public class Seccion implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (seccionPK != null ? seccionPK.hashCode() : 0);
+        hash += (codigo != null ? codigo.hashCode() : 0);
         return hash;
     }
 
@@ -97,7 +107,7 @@ public class Seccion implements Serializable {
             return false;
         }
         Seccion other = (Seccion) object;
-        if ((this.seccionPK == null && other.seccionPK != null) || (this.seccionPK != null && !this.seccionPK.equals(other.seccionPK))) {
+        if ((this.codigo == null && other.codigo != null) || (this.codigo != null && !this.codigo.equals(other.codigo))) {
             return false;
         }
         return true;
@@ -105,7 +115,7 @@ public class Seccion implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.Seccion[ seccionPK=" + seccionPK + " ]";
+        return "Entities.Seccion[ codigo=" + codigo + " ]";
     }
     
 }

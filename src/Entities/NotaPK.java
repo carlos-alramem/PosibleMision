@@ -12,7 +12,7 @@ import javax.persistence.Embeddable;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Embeddable
 public class NotaPK implements Serializable {

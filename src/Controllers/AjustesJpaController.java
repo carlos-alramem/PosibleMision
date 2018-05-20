@@ -19,7 +19,7 @@ import javax.persistence.criteria.Root;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class AjustesJpaController implements Serializable {
 

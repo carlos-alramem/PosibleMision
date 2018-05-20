@@ -6,6 +6,7 @@
 package Entities;
 
 import java.io.Serializable;
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "nota", catalog = "notas", schema = "public")
@@ -35,9 +36,12 @@ public class Nota implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected NotaPK notaPK;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Basic(optional = false)
     @Column(name = "nota")
-    private Double nota;
+    private double nota;
+    @JoinColumn(name = "cod_actividad", referencedColumnName = "codigo", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private Actividad actividad;
     @JoinColumn(name = "cod_alumno", referencedColumnName = "codigo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Alumno alumno;
@@ -47,6 +51,11 @@ public class Nota implements Serializable {
 
     public Nota(NotaPK notaPK) {
         this.notaPK = notaPK;
+    }
+
+    public Nota(NotaPK notaPK, double nota) {
+        this.notaPK = notaPK;
+        this.nota = nota;
     }
 
     public Nota(String codAlumno, int codActividad, int mes, int anio) {
@@ -61,12 +70,20 @@ public class Nota implements Serializable {
         this.notaPK = notaPK;
     }
 
-    public Double getNota() {
+    public double getNota() {
         return nota;
     }
 
-    public void setNota(Double nota) {
+    public void setNota(double nota) {
         this.nota = nota;
+    }
+
+    public Actividad getActividad() {
+        return actividad;
+    }
+
+    public void setActividad(Actividad actividad) {
+        this.actividad = actividad;
     }
 
     public Alumno getAlumno() {

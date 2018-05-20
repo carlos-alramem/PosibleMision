@@ -12,7 +12,7 @@ import javax.persistence.Embeddable;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Embeddable
 public class ObsPorAlumnoPK implements Serializable {
@@ -21,23 +21,19 @@ public class ObsPorAlumnoPK implements Serializable {
     @Column(name = "cod_alumno")
     private String codAlumno;
     @Basic(optional = false)
-    @Column(name = "cod_obs")
-    private int codObs;
+    @Column(name = "cod_observacion")
+    private int codObservacion;
     @Basic(optional = false)
     @Column(name = "mes")
     private int mes;
-    @Basic(optional = false)
-    @Column(name = "anio")
-    private int anio;
 
     public ObsPorAlumnoPK() {
     }
 
-    public ObsPorAlumnoPK(String codAlumno, int codObs, int mes, int anio) {
+    public ObsPorAlumnoPK(String codAlumno, int codObservacion, int mes) {
         this.codAlumno = codAlumno;
-        this.codObs = codObs;
+        this.codObservacion = codObservacion;
         this.mes = mes;
-        this.anio = anio;
     }
 
     public String getCodAlumno() {
@@ -48,12 +44,12 @@ public class ObsPorAlumnoPK implements Serializable {
         this.codAlumno = codAlumno;
     }
 
-    public int getCodObs() {
-        return codObs;
+    public int getCodObservacion() {
+        return codObservacion;
     }
 
-    public void setCodObs(int codObs) {
-        this.codObs = codObs;
+    public void setCodObservacion(int codObservacion) {
+        this.codObservacion = codObservacion;
     }
 
     public int getMes() {
@@ -64,21 +60,12 @@ public class ObsPorAlumnoPK implements Serializable {
         this.mes = mes;
     }
 
-    public int getAnio() {
-        return anio;
-    }
-
-    public void setAnio(int anio) {
-        this.anio = anio;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (codAlumno != null ? codAlumno.hashCode() : 0);
-        hash += (int) codObs;
+        hash += (int) codObservacion;
         hash += (int) mes;
-        hash += (int) anio;
         return hash;
     }
 
@@ -92,13 +79,10 @@ public class ObsPorAlumnoPK implements Serializable {
         if ((this.codAlumno == null && other.codAlumno != null) || (this.codAlumno != null && !this.codAlumno.equals(other.codAlumno))) {
             return false;
         }
-        if (this.codObs != other.codObs) {
+        if (this.codObservacion != other.codObservacion) {
             return false;
         }
         if (this.mes != other.mes) {
-            return false;
-        }
-        if (this.anio != other.anio) {
             return false;
         }
         return true;
@@ -106,7 +90,7 @@ public class ObsPorAlumnoPK implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.ObsPorAlumnoPK[ codAlumno=" + codAlumno + ", codObs=" + codObs + ", mes=" + mes + ", anio=" + anio + " ]";
+        return "Entities.ObsPorAlumnoPK[ codAlumno=" + codAlumno + ", codObservacion=" + codObservacion + ", mes=" + mes + " ]";
     }
     
 }

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-  <persistence-unit name="persistence" transaction-type="RESOURCE_LOCAL">
+  <persistence-unit name="LiceoLatinoamericanoPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>Entities.Promedio</class>
-    <class>Entities.Seccion</class>
-    <class>Entities.Grado</class>
-    <class>Entities.PorcentPorMes</class>
-    <class>Entities.Materia</class>
     <class>Entities.Curso</class>
-    <class>Entities.ObsPorAlumno</class>
-    <class>Entities.NomActividad</class>
-    <class>Entities.Profesor</class>
-    <class>Entities.Ajustes</class>
-    <class>Entities.Observacion</class>
-    <class>Entities.ProfPorCurso</class>
-    <class>Entities.Alumno</class>
-    <class>Entities.Actividad</class>
-    <class>Entities.ProfPorMateria</class>
+    <class>Entities.Materia</class>
+    <class>Entities.PorcentPorMes</class>
     <class>Entities.Matricula</class>
+    <class>Entities.ObsPorAlumno</class>
+    <class>Entities.Grado</class>
+    <class>Entities.Actividad</class>
+    <class>Entities.Seccion</class>
+    <class>Entities.Profesor</class>
     <class>Entities.Nivel</class>
-    <class>Entities.MatPorCurso</class>
     <class>Entities.Nota</class>
+    <class>Entities.Promedio</class>
+    <class>Entities.Observacion</class>
+    <class>Entities.MatPorCurso</class>
+    <class>Entities.Alumno</class>
+    <class>Entities.NomActividad</class>
+    <class>Entities.ProfPorMateria</class>
+    <class>Entities.Ajustes</class>
+    <class>Entities.Guia</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/notas"/>
-      <property name="javax.persistence.jdbc.user" value="carlos"/>
+      <property name="javax.persistence.jdbc.user" value="postgres"/>
       <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
       <property name="javax.persistence.jdbc.password" value="rm11048"/>
     </properties>

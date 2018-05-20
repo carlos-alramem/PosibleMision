@@ -6,82 +6,72 @@
 package Entities;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 @Entity
 @Table(name = "actividad", catalog = "notas", schema = "public")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Actividad.findAll", query = "SELECT a FROM Actividad a")
-    , @NamedQuery(name = "Actividad.findByCodigo", query = "SELECT a FROM Actividad a WHERE a.actividadPK.codigo = :codigo")
-    , @NamedQuery(name = "Actividad.findByCodPromedio", query = "SELECT a FROM Actividad a WHERE a.actividadPK.codPromedio = :codPromedio")
-    , @NamedQuery(name = "Actividad.findByCodNomActividad", query = "SELECT a FROM Actividad a WHERE a.codNomActividad = :codNomActividad")
+    , @NamedQuery(name = "Actividad.findByCodigo", query = "SELECT a FROM Actividad a WHERE a.codigo = :codigo")
     , @NamedQuery(name = "Actividad.findByActiva", query = "SELECT a FROM Actividad a WHERE a.activa = :activa")})
 public class Actividad implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected ActividadPK actividadPK;
+    @Id
     @Basic(optional = false)
-    @Column(name = "cod_nom_actividad")
-    private int codNomActividad;
+    @Column(name = "codigo")
+    private Integer codigo;
     @Basic(optional = false)
     @Column(name = "activa")
     private boolean activa;
     @JoinColumn(name = "cod_mat_curso", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
     private MatPorCurso codMatCurso;
-    @JoinColumn(name = "codigo", referencedColumnName = "codigo", insertable = false, updatable = false)
+    @JoinColumn(name = "cod_nom_actividad", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private NomActividad nomActividad;
-    @JoinColumn(name = "cod_promedio", referencedColumnName = "codigo", insertable = false, updatable = false)
+    private NomActividad codNomActividad;
+    @JoinColumn(name = "cod_promedio", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private Promedio promedio;
+    private Promedio codPromedio;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "actividad")
+    private List<Nota> notaList;
 
     public Actividad() {
     }
 
-    public Actividad(ActividadPK actividadPK) {
-        this.actividadPK = actividadPK;
+    public Actividad(Integer codigo) {
+        this.codigo = codigo;
     }
 
-    public Actividad(ActividadPK actividadPK, int codNomActividad, boolean activa) {
-        this.actividadPK = actividadPK;
-        this.codNomActividad = codNomActividad;
+    public Actividad(Integer codigo, boolean activa) {
+        this.codigo = codigo;
         this.activa = activa;
     }
 
-    public Actividad(int codigo, int codPromedio) {
-        this.actividadPK = new ActividadPK(codigo, codPromedio);
+    public Integer getCodigo() {
+        return codigo;
     }
 
-    public ActividadPK getActividadPK() {
-        return actividadPK;
-    }
-
-    public void setActividadPK(ActividadPK actividadPK) {
-        this.actividadPK = actividadPK;
-    }
-
-    public int getCodNomActividad() {
-        return codNomActividad;
-    }
-
-    public void setCodNomActividad(int codNomActividad) {
-        this.codNomActividad = codNomActividad;
+    public void setCodigo(Integer codigo) {
+        this.codigo = codigo;
     }
 
     public boolean getActiva() {
@@ -100,26 +90,35 @@ public class Actividad implements Serializable {
         this.codMatCurso = codMatCurso;
     }
 
-    public NomActividad getNomActividad() {
-        return nomActividad;
+    public NomActividad getCodNomActividad() {
+        return codNomActividad;
     }
 
-    public void setNomActividad(NomActividad nomActividad) {
-        this.nomActividad = nomActividad;
+    public void setCodNomActividad(NomActividad codNomActividad) {
+        this.codNomActividad = codNomActividad;
     }
 
-    public Promedio getPromedio() {
-        return promedio;
+    public Promedio getCodPromedio() {
+        return codPromedio;
     }
 
-    public void setPromedio(Promedio promedio) {
-        this.promedio = promedio;
+    public void setCodPromedio(Promedio codPromedio) {
+        this.codPromedio = codPromedio;
+    }
+
+    @XmlTransient
+    public List<Nota> getNotaList() {
+        return notaList;
+    }
+
+    public void setNotaList(List<Nota> notaList) {
+        this.notaList = notaList;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (actividadPK != null ? actividadPK.hashCode() : 0);
+        hash += (codigo != null ? codigo.hashCode() : 0);
         return hash;
     }
 
@@ -130,7 +129,7 @@ public class Actividad implements Serializable {
             return false;
         }
         Actividad other = (Actividad) object;
-        if ((this.actividadPK == null && other.actividadPK != null) || (this.actividadPK != null && !this.actividadPK.equals(other.actividadPK))) {
+        if ((this.codigo == null && other.codigo != null) || (this.codigo != null && !this.codigo.equals(other.codigo))) {
             return false;
         }
         return true;
@@ -138,7 +137,7 @@ public class Actividad implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.Actividad[ actividadPK=" + actividadPK + " ]";
+        return "Entities.Actividad[ codigo=" + codigo + " ]";
     }
     
 }

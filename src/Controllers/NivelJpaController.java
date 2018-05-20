@@ -17,12 +17,13 @@ import javax.persistence.criteria.Root;
 import Entities.Promedio;
 import java.util.ArrayList;
 import java.util.List;
+import Entities.PorcentPorMes;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class NivelJpaController implements Serializable {
 
@@ -39,24 +40,42 @@ public class NivelJpaController implements Serializable {
         if (nivel.getPromedioList() == null) {
             nivel.setPromedioList(new ArrayList<Promedio>());
         }
+        if (nivel.getPorcentPorMesList() == null) {
+            nivel.setPorcentPorMesList(new ArrayList<PorcentPorMes>());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
             List<Promedio> attachedPromedioList = new ArrayList<Promedio>();
             for (Promedio promedioListPromedioToAttach : nivel.getPromedioList()) {
-                promedioListPromedioToAttach = em.getReference(promedioListPromedioToAttach.getClass(), promedioListPromedioToAttach.getPromedioPK());
+                promedioListPromedioToAttach = em.getReference(promedioListPromedioToAttach.getClass(), promedioListPromedioToAttach.getCodigo());
                 attachedPromedioList.add(promedioListPromedioToAttach);
             }
             nivel.setPromedioList(attachedPromedioList);
+            List<PorcentPorMes> attachedPorcentPorMesList = new ArrayList<PorcentPorMes>();
+            for (PorcentPorMes porcentPorMesListPorcentPorMesToAttach : nivel.getPorcentPorMesList()) {
+                porcentPorMesListPorcentPorMesToAttach = em.getReference(porcentPorMesListPorcentPorMesToAttach.getClass(), porcentPorMesListPorcentPorMesToAttach.getCodigo());
+                attachedPorcentPorMesList.add(porcentPorMesListPorcentPorMesToAttach);
+            }
+            nivel.setPorcentPorMesList(attachedPorcentPorMesList);
             em.persist(nivel);
             for (Promedio promedioListPromedio : nivel.getPromedioList()) {
-                Nivel oldNivel1OfPromedioListPromedio = promedioListPromedio.getNivel1();
-                promedioListPromedio.setNivel1(nivel);
+                Nivel oldNivelOfPromedioListPromedio = promedioListPromedio.getNivel();
+                promedioListPromedio.setNivel(nivel);
                 promedioListPromedio = em.merge(promedioListPromedio);
-                if (oldNivel1OfPromedioListPromedio != null) {
-                    oldNivel1OfPromedioListPromedio.getPromedioList().remove(promedioListPromedio);
-                    oldNivel1OfPromedioListPromedio = em.merge(oldNivel1OfPromedioListPromedio);
+                if (oldNivelOfPromedioListPromedio != null) {
+                    oldNivelOfPromedioListPromedio.getPromedioList().remove(promedioListPromedio);
+                    oldNivelOfPromedioListPromedio = em.merge(oldNivelOfPromedioListPromedio);
+                }
+            }
+            for (PorcentPorMes porcentPorMesListPorcentPorMes : nivel.getPorcentPorMesList()) {
+                Nivel oldNivelOfPorcentPorMesListPorcentPorMes = porcentPorMesListPorcentPorMes.getNivel();
+                porcentPorMesListPorcentPorMes.setNivel(nivel);
+                porcentPorMesListPorcentPorMes = em.merge(porcentPorMesListPorcentPorMes);
+                if (oldNivelOfPorcentPorMesListPorcentPorMes != null) {
+                    oldNivelOfPorcentPorMesListPorcentPorMes.getPorcentPorMesList().remove(porcentPorMesListPorcentPorMes);
+                    oldNivelOfPorcentPorMesListPorcentPorMes = em.merge(oldNivelOfPorcentPorMesListPorcentPorMes);
                 }
             }
             em.getTransaction().commit();
@@ -80,13 +99,23 @@ public class NivelJpaController implements Serializable {
             Nivel persistentNivel = em.find(Nivel.class, nivel.getCodigo());
             List<Promedio> promedioListOld = persistentNivel.getPromedioList();
             List<Promedio> promedioListNew = nivel.getPromedioList();
+            List<PorcentPorMes> porcentPorMesListOld = persistentNivel.getPorcentPorMesList();
+            List<PorcentPorMes> porcentPorMesListNew = nivel.getPorcentPorMesList();
             List<String> illegalOrphanMessages = null;
             for (Promedio promedioListOldPromedio : promedioListOld) {
                 if (!promedioListNew.contains(promedioListOldPromedio)) {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Promedio " + promedioListOldPromedio + " since its nivel1 field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Promedio " + promedioListOldPromedio + " since its nivel field is not nullable.");
+                }
+            }
+            for (PorcentPorMes porcentPorMesListOldPorcentPorMes : porcentPorMesListOld) {
+                if (!porcentPorMesListNew.contains(porcentPorMesListOldPorcentPorMes)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain PorcentPorMes " + porcentPorMesListOldPorcentPorMes + " since its nivel field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -94,20 +123,38 @@ public class NivelJpaController implements Serializable {
             }
             List<Promedio> attachedPromedioListNew = new ArrayList<Promedio>();
             for (Promedio promedioListNewPromedioToAttach : promedioListNew) {
-                promedioListNewPromedioToAttach = em.getReference(promedioListNewPromedioToAttach.getClass(), promedioListNewPromedioToAttach.getPromedioPK());
+                promedioListNewPromedioToAttach = em.getReference(promedioListNewPromedioToAttach.getClass(), promedioListNewPromedioToAttach.getCodigo());
                 attachedPromedioListNew.add(promedioListNewPromedioToAttach);
             }
             promedioListNew = attachedPromedioListNew;
             nivel.setPromedioList(promedioListNew);
+            List<PorcentPorMes> attachedPorcentPorMesListNew = new ArrayList<PorcentPorMes>();
+            for (PorcentPorMes porcentPorMesListNewPorcentPorMesToAttach : porcentPorMesListNew) {
+                porcentPorMesListNewPorcentPorMesToAttach = em.getReference(porcentPorMesListNewPorcentPorMesToAttach.getClass(), porcentPorMesListNewPorcentPorMesToAttach.getCodigo());
+                attachedPorcentPorMesListNew.add(porcentPorMesListNewPorcentPorMesToAttach);
+            }
+            porcentPorMesListNew = attachedPorcentPorMesListNew;
+            nivel.setPorcentPorMesList(porcentPorMesListNew);
             nivel = em.merge(nivel);
             for (Promedio promedioListNewPromedio : promedioListNew) {
                 if (!promedioListOld.contains(promedioListNewPromedio)) {
-                    Nivel oldNivel1OfPromedioListNewPromedio = promedioListNewPromedio.getNivel1();
-                    promedioListNewPromedio.setNivel1(nivel);
+                    Nivel oldNivelOfPromedioListNewPromedio = promedioListNewPromedio.getNivel();
+                    promedioListNewPromedio.setNivel(nivel);
                     promedioListNewPromedio = em.merge(promedioListNewPromedio);
-                    if (oldNivel1OfPromedioListNewPromedio != null && !oldNivel1OfPromedioListNewPromedio.equals(nivel)) {
-                        oldNivel1OfPromedioListNewPromedio.getPromedioList().remove(promedioListNewPromedio);
-                        oldNivel1OfPromedioListNewPromedio = em.merge(oldNivel1OfPromedioListNewPromedio);
+                    if (oldNivelOfPromedioListNewPromedio != null && !oldNivelOfPromedioListNewPromedio.equals(nivel)) {
+                        oldNivelOfPromedioListNewPromedio.getPromedioList().remove(promedioListNewPromedio);
+                        oldNivelOfPromedioListNewPromedio = em.merge(oldNivelOfPromedioListNewPromedio);
+                    }
+                }
+            }
+            for (PorcentPorMes porcentPorMesListNewPorcentPorMes : porcentPorMesListNew) {
+                if (!porcentPorMesListOld.contains(porcentPorMesListNewPorcentPorMes)) {
+                    Nivel oldNivelOfPorcentPorMesListNewPorcentPorMes = porcentPorMesListNewPorcentPorMes.getNivel();
+                    porcentPorMesListNewPorcentPorMes.setNivel(nivel);
+                    porcentPorMesListNewPorcentPorMes = em.merge(porcentPorMesListNewPorcentPorMes);
+                    if (oldNivelOfPorcentPorMesListNewPorcentPorMes != null && !oldNivelOfPorcentPorMesListNewPorcentPorMes.equals(nivel)) {
+                        oldNivelOfPorcentPorMesListNewPorcentPorMes.getPorcentPorMesList().remove(porcentPorMesListNewPorcentPorMes);
+                        oldNivelOfPorcentPorMesListNewPorcentPorMes = em.merge(oldNivelOfPorcentPorMesListNewPorcentPorMes);
                     }
                 }
             }
@@ -146,7 +193,14 @@ public class NivelJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Nivel (" + nivel + ") cannot be destroyed since the Promedio " + promedioListOrphanCheckPromedio + " in its promedioList field has a non-nullable nivel1 field.");
+                illegalOrphanMessages.add("This Nivel (" + nivel + ") cannot be destroyed since the Promedio " + promedioListOrphanCheckPromedio + " in its promedioList field has a non-nullable nivel field.");
+            }
+            List<PorcentPorMes> porcentPorMesListOrphanCheck = nivel.getPorcentPorMesList();
+            for (PorcentPorMes porcentPorMesListOrphanCheckPorcentPorMes : porcentPorMesListOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Nivel (" + nivel + ") cannot be destroyed since the PorcentPorMes " + porcentPorMesListOrphanCheckPorcentPorMes + " in its porcentPorMesList field has a non-nullable nivel field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);

@@ -6,9 +6,7 @@
 package Entities;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,26 +14,24 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author carlo
  */
 @Entity
-@Table(name = "promedio", catalog = "notas", schema = "public")
+@Table(name = "guia", catalog = "notas", schema = "public")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Promedio.findAll", query = "SELECT p FROM Promedio p")
-    , @NamedQuery(name = "Promedio.findByCodigo", query = "SELECT p FROM Promedio p WHERE p.codigo = :codigo")
-    , @NamedQuery(name = "Promedio.findByAnioInicio", query = "SELECT p FROM Promedio p WHERE p.anioInicio = :anioInicio")
-    , @NamedQuery(name = "Promedio.findByAnioFin", query = "SELECT p FROM Promedio p WHERE p.anioFin = :anioFin")
-    , @NamedQuery(name = "Promedio.findByMes", query = "SELECT p FROM Promedio p WHERE p.mes = :mes")
-    , @NamedQuery(name = "Promedio.findByValor", query = "SELECT p FROM Promedio p WHERE p.valor = :valor")})
-public class Promedio implements Serializable {
+    @NamedQuery(name = "Guia.findAll", query = "SELECT g FROM Guia g")
+    , @NamedQuery(name = "Guia.findByCodigo", query = "SELECT g FROM Guia g WHERE g.codigo = :codigo")
+    , @NamedQuery(name = "Guia.findByGrado", query = "SELECT g FROM Guia g WHERE g.grado = :grado")
+    , @NamedQuery(name = "Guia.findByAnioInicio", query = "SELECT g FROM Guia g WHERE g.anioInicio = :anioInicio")
+    , @NamedQuery(name = "Guia.findByAnioFin", query = "SELECT g FROM Guia g WHERE g.anioFin = :anioFin")})
+public class Guia implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -43,36 +39,33 @@ public class Promedio implements Serializable {
     @Column(name = "codigo")
     private Integer codigo;
     @Basic(optional = false)
+    @Column(name = "grado")
+    private int grado;
+    @Basic(optional = false)
     @Column(name = "anio_inicio")
     private int anioInicio;
     @Basic(optional = false)
     @Column(name = "anio_fin")
     private int anioFin;
-    @Basic(optional = false)
-    @Column(name = "mes")
-    private int mes;
-    @Basic(optional = false)
-    @Column(name = "valor")
-    private int valor;
-    @JoinColumn(name = "nivel", referencedColumnName = "codigo")
+    @JoinColumn(name = "codigo", referencedColumnName = "codigo", insertable = false, updatable = false)
+    @OneToOne(optional = false)
+    private Grado grado1;
+    @JoinColumn(name = "dui_profesor", referencedColumnName = "dui")
     @ManyToOne(optional = false)
-    private Nivel nivel;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "codPromedio")
-    private List<Actividad> actividadList;
+    private Profesor duiProfesor;
 
-    public Promedio() {
+    public Guia() {
     }
 
-    public Promedio(Integer codigo) {
+    public Guia(Integer codigo) {
         this.codigo = codigo;
     }
 
-    public Promedio(Integer codigo, int anioInicio, int anioFin, int mes, int valor) {
+    public Guia(Integer codigo, int grado, int anioInicio, int anioFin) {
         this.codigo = codigo;
+        this.grado = grado;
         this.anioInicio = anioInicio;
         this.anioFin = anioFin;
-        this.mes = mes;
-        this.valor = valor;
     }
 
     public Integer getCodigo() {
@@ -81,6 +74,14 @@ public class Promedio implements Serializable {
 
     public void setCodigo(Integer codigo) {
         this.codigo = codigo;
+    }
+
+    public int getGrado() {
+        return grado;
+    }
+
+    public void setGrado(int grado) {
+        this.grado = grado;
     }
 
     public int getAnioInicio() {
@@ -99,37 +100,20 @@ public class Promedio implements Serializable {
         this.anioFin = anioFin;
     }
 
-    public int getMes() {
-        return mes;
+    public Grado getGrado1() {
+        return grado1;
     }
 
-    public void setMes(int mes) {
-        this.mes = mes;
+    public void setGrado1(Grado grado1) {
+        this.grado1 = grado1;
     }
 
-    public int getValor() {
-        return valor;
+    public Profesor getDuiProfesor() {
+        return duiProfesor;
     }
 
-    public void setValor(int valor) {
-        this.valor = valor;
-    }
-
-    public Nivel getNivel() {
-        return nivel;
-    }
-
-    public void setNivel(Nivel nivel) {
-        this.nivel = nivel;
-    }
-
-    @XmlTransient
-    public List<Actividad> getActividadList() {
-        return actividadList;
-    }
-
-    public void setActividadList(List<Actividad> actividadList) {
-        this.actividadList = actividadList;
+    public void setDuiProfesor(Profesor duiProfesor) {
+        this.duiProfesor = duiProfesor;
     }
 
     @Override
@@ -142,10 +126,10 @@ public class Promedio implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Promedio)) {
+        if (!(object instanceof Guia)) {
             return false;
         }
-        Promedio other = (Promedio) object;
+        Guia other = (Guia) object;
         if ((this.codigo == null && other.codigo != null) || (this.codigo != null && !this.codigo.equals(other.codigo))) {
             return false;
         }
@@ -154,7 +138,7 @@ public class Promedio implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.Promedio[ codigo=" + codigo + " ]";
+        return "Entities.Guia[ codigo=" + codigo + " ]";
     }
     
 }

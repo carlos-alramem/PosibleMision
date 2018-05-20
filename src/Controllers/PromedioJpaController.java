@@ -16,7 +16,6 @@ import javax.persistence.criteria.Root;
 import Entities.Nivel;
 import Entities.Actividad;
 import Entities.Promedio;
-import Entities.PromedioPK;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -24,7 +23,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class PromedioJpaController implements Serializable {
 
@@ -38,45 +37,41 @@ public class PromedioJpaController implements Serializable {
     }
 
     public void create(Promedio promedio) throws PreexistingEntityException, Exception {
-        if (promedio.getPromedioPK() == null) {
-            promedio.setPromedioPK(new PromedioPK());
-        }
         if (promedio.getActividadList() == null) {
             promedio.setActividadList(new ArrayList<Actividad>());
         }
-        promedio.getPromedioPK().setNivel(promedio.getNivel1().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Nivel nivel1 = promedio.getNivel1();
-            if (nivel1 != null) {
-                nivel1 = em.getReference(nivel1.getClass(), nivel1.getCodigo());
-                promedio.setNivel1(nivel1);
+            Nivel nivel = promedio.getNivel();
+            if (nivel != null) {
+                nivel = em.getReference(nivel.getClass(), nivel.getCodigo());
+                promedio.setNivel(nivel);
             }
             List<Actividad> attachedActividadList = new ArrayList<Actividad>();
             for (Actividad actividadListActividadToAttach : promedio.getActividadList()) {
-                actividadListActividadToAttach = em.getReference(actividadListActividadToAttach.getClass(), actividadListActividadToAttach.getActividadPK());
+                actividadListActividadToAttach = em.getReference(actividadListActividadToAttach.getClass(), actividadListActividadToAttach.getCodigo());
                 attachedActividadList.add(actividadListActividadToAttach);
             }
             promedio.setActividadList(attachedActividadList);
             em.persist(promedio);
-            if (nivel1 != null) {
-                nivel1.getPromedioList().add(promedio);
-                nivel1 = em.merge(nivel1);
+            if (nivel != null) {
+                nivel.getPromedioList().add(promedio);
+                nivel = em.merge(nivel);
             }
             for (Actividad actividadListActividad : promedio.getActividadList()) {
-                Promedio oldPromedioOfActividadListActividad = actividadListActividad.getPromedio();
-                actividadListActividad.setPromedio(promedio);
+                Promedio oldCodPromedioOfActividadListActividad = actividadListActividad.getCodPromedio();
+                actividadListActividad.setCodPromedio(promedio);
                 actividadListActividad = em.merge(actividadListActividad);
-                if (oldPromedioOfActividadListActividad != null) {
-                    oldPromedioOfActividadListActividad.getActividadList().remove(actividadListActividad);
-                    oldPromedioOfActividadListActividad = em.merge(oldPromedioOfActividadListActividad);
+                if (oldCodPromedioOfActividadListActividad != null) {
+                    oldCodPromedioOfActividadListActividad.getActividadList().remove(actividadListActividad);
+                    oldCodPromedioOfActividadListActividad = em.merge(oldCodPromedioOfActividadListActividad);
                 }
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findPromedio(promedio.getPromedioPK()) != null) {
+            if (findPromedio(promedio.getCodigo()) != null) {
                 throw new PreexistingEntityException("Promedio " + promedio + " already exists.", ex);
             }
             throw ex;
@@ -88,14 +83,13 @@ public class PromedioJpaController implements Serializable {
     }
 
     public void edit(Promedio promedio) throws IllegalOrphanException, NonexistentEntityException, Exception {
-        promedio.getPromedioPK().setNivel(promedio.getNivel1().getCodigo());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Promedio persistentPromedio = em.find(Promedio.class, promedio.getPromedioPK());
-            Nivel nivel1Old = persistentPromedio.getNivel1();
-            Nivel nivel1New = promedio.getNivel1();
+            Promedio persistentPromedio = em.find(Promedio.class, promedio.getCodigo());
+            Nivel nivelOld = persistentPromedio.getNivel();
+            Nivel nivelNew = promedio.getNivel();
             List<Actividad> actividadListOld = persistentPromedio.getActividadList();
             List<Actividad> actividadListNew = promedio.getActividadList();
             List<String> illegalOrphanMessages = null;
@@ -104,40 +98,40 @@ public class PromedioJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Actividad " + actividadListOldActividad + " since its promedio field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Actividad " + actividadListOldActividad + " since its codPromedio field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
-            if (nivel1New != null) {
-                nivel1New = em.getReference(nivel1New.getClass(), nivel1New.getCodigo());
-                promedio.setNivel1(nivel1New);
+            if (nivelNew != null) {
+                nivelNew = em.getReference(nivelNew.getClass(), nivelNew.getCodigo());
+                promedio.setNivel(nivelNew);
             }
             List<Actividad> attachedActividadListNew = new ArrayList<Actividad>();
             for (Actividad actividadListNewActividadToAttach : actividadListNew) {
-                actividadListNewActividadToAttach = em.getReference(actividadListNewActividadToAttach.getClass(), actividadListNewActividadToAttach.getActividadPK());
+                actividadListNewActividadToAttach = em.getReference(actividadListNewActividadToAttach.getClass(), actividadListNewActividadToAttach.getCodigo());
                 attachedActividadListNew.add(actividadListNewActividadToAttach);
             }
             actividadListNew = attachedActividadListNew;
             promedio.setActividadList(actividadListNew);
             promedio = em.merge(promedio);
-            if (nivel1Old != null && !nivel1Old.equals(nivel1New)) {
-                nivel1Old.getPromedioList().remove(promedio);
-                nivel1Old = em.merge(nivel1Old);
+            if (nivelOld != null && !nivelOld.equals(nivelNew)) {
+                nivelOld.getPromedioList().remove(promedio);
+                nivelOld = em.merge(nivelOld);
             }
-            if (nivel1New != null && !nivel1New.equals(nivel1Old)) {
-                nivel1New.getPromedioList().add(promedio);
-                nivel1New = em.merge(nivel1New);
+            if (nivelNew != null && !nivelNew.equals(nivelOld)) {
+                nivelNew.getPromedioList().add(promedio);
+                nivelNew = em.merge(nivelNew);
             }
             for (Actividad actividadListNewActividad : actividadListNew) {
                 if (!actividadListOld.contains(actividadListNewActividad)) {
-                    Promedio oldPromedioOfActividadListNewActividad = actividadListNewActividad.getPromedio();
-                    actividadListNewActividad.setPromedio(promedio);
+                    Promedio oldCodPromedioOfActividadListNewActividad = actividadListNewActividad.getCodPromedio();
+                    actividadListNewActividad.setCodPromedio(promedio);
                     actividadListNewActividad = em.merge(actividadListNewActividad);
-                    if (oldPromedioOfActividadListNewActividad != null && !oldPromedioOfActividadListNewActividad.equals(promedio)) {
-                        oldPromedioOfActividadListNewActividad.getActividadList().remove(actividadListNewActividad);
-                        oldPromedioOfActividadListNewActividad = em.merge(oldPromedioOfActividadListNewActividad);
+                    if (oldCodPromedioOfActividadListNewActividad != null && !oldCodPromedioOfActividadListNewActividad.equals(promedio)) {
+                        oldCodPromedioOfActividadListNewActividad.getActividadList().remove(actividadListNewActividad);
+                        oldCodPromedioOfActividadListNewActividad = em.merge(oldCodPromedioOfActividadListNewActividad);
                     }
                 }
             }
@@ -145,7 +139,7 @@ public class PromedioJpaController implements Serializable {
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                PromedioPK id = promedio.getPromedioPK();
+                Integer id = promedio.getCodigo();
                 if (findPromedio(id) == null) {
                     throw new NonexistentEntityException("The promedio with id " + id + " no longer exists.");
                 }
@@ -158,7 +152,7 @@ public class PromedioJpaController implements Serializable {
         }
     }
 
-    public void destroy(PromedioPK id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -166,7 +160,7 @@ public class PromedioJpaController implements Serializable {
             Promedio promedio;
             try {
                 promedio = em.getReference(Promedio.class, id);
-                promedio.getPromedioPK();
+                promedio.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The promedio with id " + id + " no longer exists.", enfe);
             }
@@ -176,15 +170,15 @@ public class PromedioJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Promedio (" + promedio + ") cannot be destroyed since the Actividad " + actividadListOrphanCheckActividad + " in its actividadList field has a non-nullable promedio field.");
+                illegalOrphanMessages.add("This Promedio (" + promedio + ") cannot be destroyed since the Actividad " + actividadListOrphanCheckActividad + " in its actividadList field has a non-nullable codPromedio field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
-            Nivel nivel1 = promedio.getNivel1();
-            if (nivel1 != null) {
-                nivel1.getPromedioList().remove(promedio);
-                nivel1 = em.merge(nivel1);
+            Nivel nivel = promedio.getNivel();
+            if (nivel != null) {
+                nivel.getPromedioList().remove(promedio);
+                nivel = em.merge(nivel);
             }
             em.remove(promedio);
             em.getTransaction().commit();
@@ -219,7 +213,7 @@ public class PromedioJpaController implements Serializable {
         }
     }
 
-    public Promedio findPromedio(PromedioPK id) {
+    public Promedio findPromedio(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Promedio.class, id);

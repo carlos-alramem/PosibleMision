@@ -22,7 +22,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class NomActividadJpaController implements Serializable {
 
@@ -45,18 +45,18 @@ public class NomActividadJpaController implements Serializable {
             em.getTransaction().begin();
             List<Actividad> attachedActividadList = new ArrayList<Actividad>();
             for (Actividad actividadListActividadToAttach : nomActividad.getActividadList()) {
-                actividadListActividadToAttach = em.getReference(actividadListActividadToAttach.getClass(), actividadListActividadToAttach.getActividadPK());
+                actividadListActividadToAttach = em.getReference(actividadListActividadToAttach.getClass(), actividadListActividadToAttach.getCodigo());
                 attachedActividadList.add(actividadListActividadToAttach);
             }
             nomActividad.setActividadList(attachedActividadList);
             em.persist(nomActividad);
             for (Actividad actividadListActividad : nomActividad.getActividadList()) {
-                NomActividad oldNomActividadOfActividadListActividad = actividadListActividad.getNomActividad();
-                actividadListActividad.setNomActividad(nomActividad);
+                NomActividad oldCodNomActividadOfActividadListActividad = actividadListActividad.getCodNomActividad();
+                actividadListActividad.setCodNomActividad(nomActividad);
                 actividadListActividad = em.merge(actividadListActividad);
-                if (oldNomActividadOfActividadListActividad != null) {
-                    oldNomActividadOfActividadListActividad.getActividadList().remove(actividadListActividad);
-                    oldNomActividadOfActividadListActividad = em.merge(oldNomActividadOfActividadListActividad);
+                if (oldCodNomActividadOfActividadListActividad != null) {
+                    oldCodNomActividadOfActividadListActividad.getActividadList().remove(actividadListActividad);
+                    oldCodNomActividadOfActividadListActividad = em.merge(oldCodNomActividadOfActividadListActividad);
                 }
             }
             em.getTransaction().commit();
@@ -86,7 +86,7 @@ public class NomActividadJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Actividad " + actividadListOldActividad + " since its nomActividad field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Actividad " + actividadListOldActividad + " since its codNomActividad field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -94,7 +94,7 @@ public class NomActividadJpaController implements Serializable {
             }
             List<Actividad> attachedActividadListNew = new ArrayList<Actividad>();
             for (Actividad actividadListNewActividadToAttach : actividadListNew) {
-                actividadListNewActividadToAttach = em.getReference(actividadListNewActividadToAttach.getClass(), actividadListNewActividadToAttach.getActividadPK());
+                actividadListNewActividadToAttach = em.getReference(actividadListNewActividadToAttach.getClass(), actividadListNewActividadToAttach.getCodigo());
                 attachedActividadListNew.add(actividadListNewActividadToAttach);
             }
             actividadListNew = attachedActividadListNew;
@@ -102,12 +102,12 @@ public class NomActividadJpaController implements Serializable {
             nomActividad = em.merge(nomActividad);
             for (Actividad actividadListNewActividad : actividadListNew) {
                 if (!actividadListOld.contains(actividadListNewActividad)) {
-                    NomActividad oldNomActividadOfActividadListNewActividad = actividadListNewActividad.getNomActividad();
-                    actividadListNewActividad.setNomActividad(nomActividad);
+                    NomActividad oldCodNomActividadOfActividadListNewActividad = actividadListNewActividad.getCodNomActividad();
+                    actividadListNewActividad.setCodNomActividad(nomActividad);
                     actividadListNewActividad = em.merge(actividadListNewActividad);
-                    if (oldNomActividadOfActividadListNewActividad != null && !oldNomActividadOfActividadListNewActividad.equals(nomActividad)) {
-                        oldNomActividadOfActividadListNewActividad.getActividadList().remove(actividadListNewActividad);
-                        oldNomActividadOfActividadListNewActividad = em.merge(oldNomActividadOfActividadListNewActividad);
+                    if (oldCodNomActividadOfActividadListNewActividad != null && !oldCodNomActividadOfActividadListNewActividad.equals(nomActividad)) {
+                        oldCodNomActividadOfActividadListNewActividad.getActividadList().remove(actividadListNewActividad);
+                        oldCodNomActividadOfActividadListNewActividad = em.merge(oldCodNomActividadOfActividadListNewActividad);
                     }
                 }
             }
@@ -146,7 +146,7 @@ public class NomActividadJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This NomActividad (" + nomActividad + ") cannot be destroyed since the Actividad " + actividadListOrphanCheckActividad + " in its actividadList field has a non-nullable nomActividad field.");
+                illegalOrphanMessages.add("This NomActividad (" + nomActividad + ") cannot be destroyed since the Actividad " + actividadListOrphanCheckActividad + " in its actividadList field has a non-nullable codNomActividad field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);

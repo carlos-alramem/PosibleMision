@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import Entities.Grado;
 import Entities.Seccion;
-import Entities.SeccionPK;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -23,7 +22,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  *
- * @author carlos
+ * @author carlo
  */
 public class SeccionJpaController implements Serializable {
 
@@ -37,9 +36,6 @@ public class SeccionJpaController implements Serializable {
     }
 
     public void create(Seccion seccion) throws PreexistingEntityException, Exception {
-        if (seccion.getSeccionPK() == null) {
-            seccion.setSeccionPK(new SeccionPK());
-        }
         if (seccion.getGradoList() == null) {
             seccion.setGradoList(new ArrayList<Grado>());
         }
@@ -49,23 +45,23 @@ public class SeccionJpaController implements Serializable {
             em.getTransaction().begin();
             List<Grado> attachedGradoList = new ArrayList<Grado>();
             for (Grado gradoListGradoToAttach : seccion.getGradoList()) {
-                gradoListGradoToAttach = em.getReference(gradoListGradoToAttach.getClass(), gradoListGradoToAttach.getGradoPK());
+                gradoListGradoToAttach = em.getReference(gradoListGradoToAttach.getClass(), gradoListGradoToAttach.getCodigo());
                 attachedGradoList.add(gradoListGradoToAttach);
             }
             seccion.setGradoList(attachedGradoList);
             em.persist(seccion);
             for (Grado gradoListGrado : seccion.getGradoList()) {
-                Seccion oldSeccionOfGradoListGrado = gradoListGrado.getSeccion();
-                gradoListGrado.setSeccion(seccion);
+                Seccion oldCodSeccionOfGradoListGrado = gradoListGrado.getCodSeccion();
+                gradoListGrado.setCodSeccion(seccion);
                 gradoListGrado = em.merge(gradoListGrado);
-                if (oldSeccionOfGradoListGrado != null) {
-                    oldSeccionOfGradoListGrado.getGradoList().remove(gradoListGrado);
-                    oldSeccionOfGradoListGrado = em.merge(oldSeccionOfGradoListGrado);
+                if (oldCodSeccionOfGradoListGrado != null) {
+                    oldCodSeccionOfGradoListGrado.getGradoList().remove(gradoListGrado);
+                    oldCodSeccionOfGradoListGrado = em.merge(oldCodSeccionOfGradoListGrado);
                 }
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findSeccion(seccion.getSeccionPK()) != null) {
+            if (findSeccion(seccion.getCodigo()) != null) {
                 throw new PreexistingEntityException("Seccion " + seccion + " already exists.", ex);
             }
             throw ex;
@@ -81,7 +77,7 @@ public class SeccionJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Seccion persistentSeccion = em.find(Seccion.class, seccion.getSeccionPK());
+            Seccion persistentSeccion = em.find(Seccion.class, seccion.getCodigo());
             List<Grado> gradoListOld = persistentSeccion.getGradoList();
             List<Grado> gradoListNew = seccion.getGradoList();
             List<String> illegalOrphanMessages = null;
@@ -90,7 +86,7 @@ public class SeccionJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Grado " + gradoListOldGrado + " since its seccion field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Grado " + gradoListOldGrado + " since its codSeccion field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -98,7 +94,7 @@ public class SeccionJpaController implements Serializable {
             }
             List<Grado> attachedGradoListNew = new ArrayList<Grado>();
             for (Grado gradoListNewGradoToAttach : gradoListNew) {
-                gradoListNewGradoToAttach = em.getReference(gradoListNewGradoToAttach.getClass(), gradoListNewGradoToAttach.getGradoPK());
+                gradoListNewGradoToAttach = em.getReference(gradoListNewGradoToAttach.getClass(), gradoListNewGradoToAttach.getCodigo());
                 attachedGradoListNew.add(gradoListNewGradoToAttach);
             }
             gradoListNew = attachedGradoListNew;
@@ -106,12 +102,12 @@ public class SeccionJpaController implements Serializable {
             seccion = em.merge(seccion);
             for (Grado gradoListNewGrado : gradoListNew) {
                 if (!gradoListOld.contains(gradoListNewGrado)) {
-                    Seccion oldSeccionOfGradoListNewGrado = gradoListNewGrado.getSeccion();
-                    gradoListNewGrado.setSeccion(seccion);
+                    Seccion oldCodSeccionOfGradoListNewGrado = gradoListNewGrado.getCodSeccion();
+                    gradoListNewGrado.setCodSeccion(seccion);
                     gradoListNewGrado = em.merge(gradoListNewGrado);
-                    if (oldSeccionOfGradoListNewGrado != null && !oldSeccionOfGradoListNewGrado.equals(seccion)) {
-                        oldSeccionOfGradoListNewGrado.getGradoList().remove(gradoListNewGrado);
-                        oldSeccionOfGradoListNewGrado = em.merge(oldSeccionOfGradoListNewGrado);
+                    if (oldCodSeccionOfGradoListNewGrado != null && !oldCodSeccionOfGradoListNewGrado.equals(seccion)) {
+                        oldCodSeccionOfGradoListNewGrado.getGradoList().remove(gradoListNewGrado);
+                        oldCodSeccionOfGradoListNewGrado = em.merge(oldCodSeccionOfGradoListNewGrado);
                     }
                 }
             }
@@ -119,7 +115,7 @@ public class SeccionJpaController implements Serializable {
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                SeccionPK id = seccion.getSeccionPK();
+                Integer id = seccion.getCodigo();
                 if (findSeccion(id) == null) {
                     throw new NonexistentEntityException("The seccion with id " + id + " no longer exists.");
                 }
@@ -132,7 +128,7 @@ public class SeccionJpaController implements Serializable {
         }
     }
 
-    public void destroy(SeccionPK id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -140,7 +136,7 @@ public class SeccionJpaController implements Serializable {
             Seccion seccion;
             try {
                 seccion = em.getReference(Seccion.class, id);
-                seccion.getSeccionPK();
+                seccion.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The seccion with id " + id + " no longer exists.", enfe);
             }
@@ -150,7 +146,7 @@ public class SeccionJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Seccion (" + seccion + ") cannot be destroyed since the Grado " + gradoListOrphanCheckGrado + " in its gradoList field has a non-nullable seccion field.");
+                illegalOrphanMessages.add("This Seccion (" + seccion + ") cannot be destroyed since the Grado " + gradoListOrphanCheckGrado + " in its gradoList field has a non-nullable codSeccion field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
@@ -188,7 +184,7 @@ public class SeccionJpaController implements Serializable {
         }
     }
 
-    public Seccion findSeccion(SeccionPK id) {
+    public Seccion findSeccion(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Seccion.class, id);
