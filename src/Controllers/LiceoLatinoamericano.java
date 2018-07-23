@@ -5,8 +5,9 @@
  */
 package Controllers;
 
-import Entities.Alumno;
+import DataAccess.Data;
 import GUI.Controllers.MainController;
+import java.sql.ResultSet;
 import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -31,7 +32,6 @@ public class LiceoLatinoamericano extends Application {
             primaryStage.setScene(sceneHome);
             primaryStage.initStyle(StageStyle.UNDECORATED);
             primaryStage.show();
-            
                         
         } 
         catch (Exception e) {
